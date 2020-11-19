@@ -4,6 +4,8 @@ The goal of this repo is to provide a simple yet robust static site generator. I
 
 I've setup the make file to do a lot of SEO work for you. The included shell has meta tags for Twitter, Facebook and Google. The index file also includes a PWA script from PWA Builder. Each of the posts will generate structured data tags based on the custom meta tags you provide. The script auto generates a sitemap.xml file each time you run the make file. 
 
+All none-minified (`bootstrap.css` not `bootstrap.min.css`) js/css files in their perspective folders get compressed and combined into a single js and css file.
+
 ##Setup
 
 Be sure to run `npm i`.
