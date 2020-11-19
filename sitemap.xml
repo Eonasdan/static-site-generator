@@ -1,0 +1,12 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url>
+<loc>https://localhost:3000</loc>
+<lastmod>2020-11-19T20:10:22.468Z</lastmod>
+<priority>1.00</priority>
+</url>
+<url>
+<loc>https://localhost:3000/posts/man-must-explore-and-this-is-exploration-at-its-greatest.html</loc>
+<lastmod>2020-11-20T05:00:00.000Z</lastmod>
+<priority>0.80</priority>
+</url>
+</urlset>
