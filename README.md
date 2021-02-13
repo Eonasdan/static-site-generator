@@ -6,7 +6,7 @@ I've setup the make file to do a lot of SEO work for you. The included shell has
 
 All none-minified (`bootstrap.css` not `bootstrap.min.css`) js/css files in their perspective folders get compressed and combined into a single js and css file.
 
-##Setup
+## Setup
 
 Be sure to run `npm i`.
 
@@ -14,7 +14,7 @@ That's really all you *have* to do. You can now run `npm start` and browser-sync
 
 If you want the service worker (PWA) to work locally, you will need to provide a self signed cert to the browser-sync config file (`build/bs-config.js`). Otherwise, the console will complain, however if you deploy this to Github Pages, it will be fine.
 
-###Templates
+### Templates
 
 You will need to update the templates under `/build/templates`.
 
