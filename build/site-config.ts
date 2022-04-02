@@ -4,9 +4,12 @@ export interface SiteConfig {
         subfolder?: string;
     }
     output: {
-        main: string,
-        posts: string,
+        main: string;
+        posts: string;
     },
     source: string;
-    port: number;
+    server: {
+        serveFrom: string;
+        port: number;
+    }
 }

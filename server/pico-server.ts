@@ -15,6 +15,7 @@ export default class PicoServer {
     private readonly host: string;
     private readonly port: number;
     private readonly directory: string;
+    private readonly sub: string;
     private middlewares: Stack[] = [];
 
     constructor(config?: Config) {
@@ -22,6 +23,7 @@ export default class PicoServer {
             this.host = config.host || 'localhost';
             this.port = config.port || 62295;
             this.directory = config.directory || 'site';
+            this.sub = config.sub;
             config.middlewares.forEach(x => this.addMiddleware(x.middleware, x.route));
         }
     }
@@ -103,6 +105,10 @@ export default class PicoServer {
         let url = req.url;
         if (url.endsWith('/')) url += 'index.html'
          directory = directory || this.directory;
+        if (this.sub) {
+            directory = directory.replace(this.sub, '');
+            url = url.replace(this.sub, '');
+        }
         try {
             const filePath = path.join(__dirname, directory, url);
             let fileExists = await fs.stat(filePath);

@@ -4,9 +4,12 @@
     "subfolder" : "static-site-generator"
   },
   "output" : {
-    "main": "site/static-site-generator",
+    "main": "site",
     "posts" : "posts"
   },
   "source": "site-source",
-  "port": 62296
+  "server" : {
+    "serveFrom": "site",
+    "port": 62296
+  }
 }

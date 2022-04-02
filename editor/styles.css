@@ -1,0 +1,109 @@
+:root {
+    --blue: #007bff;
+    --indigo: #6610f2;
+    --purple: #6f42c1;
+    --pink: #e83e8c;
+    --red: #dc3545;
+    --orange: #fd7e14;
+    --yellow: #ffc107;
+    --green: #28a745;
+    --teal: #20c997;
+    --cyan: #17a2b8;
+    --white: #fff;
+    --gray: #6c757d;
+    --gray-dark: #343a40;
+    --primary: #78d5ef;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --eerieBlack: #171717;
+}
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.btn-primary {
+    color: var(--dark);
+    background-color: var(--primary);
+}
+
+.btn-secondary {
+    color: var(--white);
+    background-color: var(--secondary);
+}
+
+.btn-success {
+    color: var(--white);
+    background-color: var(--success);
+}
+
+.btn-warning {
+    color: var(--dark);
+    background-color: var(--warning);
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: var(--dark);
+    color: var(--white);
+}
+
+.modal-content, .accordion-item {
+    background-color: var(--eerieBlack);
+    color: var(--white);
+}
+
+#editorjs {
+    border: 1px solid white;
+}
+
+.form-control {
+    background-color: transparent;
+    color: var(--gray);
+}
+
+.form-control:focus {
+    background-color: transparent;
+    color: var(--gray);
+    border-color: #86b7fe;
+}
+
+/** editor **/
+.ce-block--selected .ce-block__content, .ce-inline-toolbar,
+.codex-editor--narrow .ce-toolbox,
+.ce-conversion-toolbar, .ce-settings, .ce-settings__button,
+.ce-toolbar__settings-btn, .cdx-button {
+    background: #007991;
+    color: inherit;
+}
+
+.ce-inline-tool, .ce-conversion-toolbar__label, .ce-toolbox__button, .cdx-settings-button, .ce-toolbar__plus {
+    color: inherit;
+}
+
+::selection {
+    background: #439A86;
+}
+
+.cdx-settings-button:hover, .ce-settings__button:hover, .ce-toolbox__button--active, .ce-toolbox__button:hover,
+.cdx-button:hover, .ce-inline-toolbar__dropdown:hover, .ce-inline-tool:hover {
+    background-color: #439A86;
+    color: inherit;
+}
+
+.cdx-notify--error {
+    background: #fb5d5d!important;
+}
+
+.cdx-notify__cross::after, .cdx-notify__cross::before {
+    background: white;
+}

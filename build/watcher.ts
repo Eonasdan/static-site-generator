@@ -1,8 +1,9 @@
 import {IncomingMessage, ServerResponse} from 'http';
 import formidable from 'formidable';
+import * as path from 'path';
 
 const chokidar = require('chokidar');
-import * as path from 'path';
+
 import PicoServer from '../server/pico-server';
 import {Next} from '../server/middleware';
 import Build from './build';
@@ -20,10 +21,11 @@ export class Watcher {
     }
 
     async startAsync() {
-        this.builder.updateAll();
+        await this.builder.updateAllAsync();
         this.pico = new PicoServer({
-            port: this.builder.siteConfig.port,
-            directory: '../site',
+            port: this.builder.siteConfig.server.port,
+            directory: `../${this.builder.siteConfig.server.serveFrom}`,
+            sub: this.builder.siteConfig.site.subfolder,
             middlewares: [
                 {
                     middleware: this.uploadMiddlewareAsync,
@@ -84,14 +86,14 @@ export class Watcher {
 
     async editorSaveAsync(req: IncomingMessage, res: ServerResponse, next: Next) {
         const form = formidable({multiples: true, keepExtensions: true, uploadDir: './img_temp'});
-        form.parse(req, (err, fields, files) => {
+        form.parse(req, async (err, fields, files) => {
             const slug = fields.title.toLowerCase().replace(/ /g, '-')
                 .replace(/[^\w-]+/g, '');
 
             const editor = JSON.parse(fields.editor);
             const postDate = new Date(fields.postDate);
 
-            const result = this.builder.save(new PostMeta(slug, fields.title,
+            const result = await this.builder.saveAsync(new PostMeta(slug, fields.title,
                 '', postDate, postDate, files.thumbnail.path,
                 fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl)
             ), editor);
@@ -129,28 +131,28 @@ export class Watcher {
         let lastChange = '';
         let lastChangeFile = '';
 
-        const handleChange = (event, path) => {
+        const handleChange = async (event, path) => {
             Utilities.log(`${event}: ${path}`);
             if (path.startsWith(partials)) {
-                this.builder.updatePosts();
+                await this.builder.updatePostsAsync();
             }
             if (path.startsWith(styles)) {
-                this.builder.updateCss();
+                await this.builder.updateCssAsync();
             }
             if (path.startsWith(templates)) {
-                this.builder.updateAll();
+                await this.builder.updateAllAsync();
             }
             if (path.startsWith(js)) {
-                this.builder.minifyJs().then();
+                await this.builder.minifyJsAsync();
             }
             if (path.startsWith(copy)) {
                 const destination = path.replace(copy, main)
                 switch (event) {
                     case 'add':
-                        this.builder.copyFile(path, destination);
+                        await this.builder.copyFileAsync(path, destination);
                         break;
                     case 'unlink':
-                        this.builder.removeFile(destination);
+                        await this.builder.removeFileAsync(destination);
                         break;
                 }
             }

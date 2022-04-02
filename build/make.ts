@@ -4,12 +4,12 @@ import Build from './build';
 class Make {
     private watcher: Watcher;
     private builder = new Build();
-    
+
     async doAsync() {
         const args = process.argv.slice(2);
         this.builder.usePwa = !!args.includes('--pwa');
         if (args.includes('--watch')) this.watcher = new Watcher(this.builder);
-        else this.builder.updateAll();
+        else await this.builder.updateAllAsync();
     }
 }
 

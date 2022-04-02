@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Blog of the endless loop programmer Eonasdan.">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Editor</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta class="metaTitle" name="title" content="Eonasdan's Blog"/>
+    <meta class="metaDescription" name="description" content="Blog of the endless loop programmer Eonasdan."/>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article"/>
+    <meta class="metaUrl" property="og:url" content="https://eonasdan.com"/>
+    <meta class="metaTitle" property="og:title" content="Eonasdan's Blog"/>
+    <meta class="metaDescription" property="og:description" content="Blog of the endless loop programmer Eonasdan."/>
+    <meta class="metaImage" property="og:image" content=""/>
+
+    <meta class="metaPublishedTime" property="article:published_time" content=""/>
+    <meta class="metaModifiedTime" property="article:modified_time" content=""/>
+    <meta class="metaTag" property="article:tag" content=""/>
+    <meta property="article:author" content="Jonathan Peterson"/>
+    <meta property="article:section" content="Technology"/>
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:site" content="@eonasdan"/>
+    <meta property="twitter:creator" content="@eonasdan"/>
+    <meta class="metaUrl" property="twitter:url" content="https://eonasdan.com"/>
+    <meta class="metaTitle" property="twitter:title" content=""/>
+    <meta class="metaDescription" property="twitter:description"
+          content="Blog of the endless loop programmer Eonasdan."/>
+    <meta class="metaImage" property="twitter:image" content=""/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/style.min.css"/>
+
+    <!-- editor -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+    <script src="https://cdn.jsdelivr.net/gh/paraswaykole/editor-js-code@latest/dist/bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/editorjs-parser@1/build/Parser.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.3.1/dist/bundle.min.js"></script>
+
+    <link rel="stylesheet" href="/editor/styles.css"/>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark ftco-navbar bg-dark ftco-navbar-light scrolled awake" id="ftco-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">Editor</a>
+        <div class="top-meta-data d-flex align-items-center justify-content-end">
+            <div class="top-social-info">
+                <button id="clearButton" class="btn btn-warning mr-5">Clear</button>
+                <button id="previewButton" class="btn btn-primary mr-3">Preview</button>
+                <button id="save" class="btn btn-success mr-3">Save</button>
+            </div>
+            <div class="top-search-area">
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="mainContent">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="accordion show" id="editorContainer">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                                aria-controls="panelsStayOpen-collapseOne">
+                            Meta
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show"
+                         aria-labelledby="panelsStayOpen-headingOne">
+                        <div id="postMeta" class="accordion-body">
+                            <form id="postMetaForm" action="" method="post">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Post Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required/>
+                                    <div class="invalid-feedback">
+                                        Required
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="thumbnail" class="form-label">Thumbnail</label>
+                                    <input class="form-control" type="file" id="thumbnail" name="thumbnail"
+                                           accept="image/*"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="postDate" class="form-label">Post Date</label>
+                                    <input type="date" class="form-control" id="postDate" name="postDate" required/>
+                                    <div class="invalid-feedback">
+                                        Required
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="excerpt" class="form-label">Excerpt</label>
+                                    <textarea type="text" class="form-control" id="excerpt" name="excerpt"
+                                              required></textarea>
+                                    <div class="invalid-feedback">
+                                        Required
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tags" class="form-label">Tags (separate by comma)</label>
+                                    <input type="text" class="form-control" id="tags" name="tags" required/>
+                                    <div class="invalid-feedback">
+                                        Required
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="postAuthorName" class="form-label">Post Author Name</label>
+                                    <input type="text" class="form-control" id="postAuthorName" name="postAuthorName"
+                                           required/>
+                                    <div class="invalid-feedback">
+                                        Required
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="postAuthorUrl" class="form-label">Post Author Url</label>
+                                    <input type="text" class="form-control" id="postAuthorUrl" name="postAuthorUrl"/>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                                aria-controls="panelsStayOpen-collapseTwo">
+                            Editor
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
+                         aria-labelledby="panelsStayOpen-headingTwo">
+                        <div class="accordion-body">
+                            <div id="editorjs">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="output" class="post-details-area mb-80 hide">
+        <div id="post-container" class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div id="post-thumbnail" class="post-details-thumb mb-50">
+                        <img src="https://placekitten.com/1200/615" alt="Building a Small Date library" class="img-fluid" width="1200">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <!-- Post Details Content Area -->
+                <div class="col-12 col-lg-8 col-xl-7">
+                    <div class="post-details-content">
+                        <div class="blog-content">
+                            <div id="post-inner">
+                                <article>
+                                    <div class="post-content mt-0">
+                                        <h1 class="post-title mb-2">--Title--</h1>
+
+                                        <div class="d-flex justify-content-between mb-30">
+                                            <div class="post-meta d-flex align-items-center">
+                                                <span class="post-author">--Author--</span>
+                                                <i class="far fa-circle" aria-hidden="true"></i>
+                                                <span class="post-date">--Post Date--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="previewContent">
+
+                                    </div>
+                                    <div class="post-tags mt-30">
+                                        <ul id="tagsContainer"></ul>
+                                    </div>
+                                </article>
+                            </div>
+
+                            <!-- Comment Area Start -->
+                            <div class="comment_area clearfix mb-50">
+
+                                <!-- Section Title -->
+                                <div class="section-heading style-2">
+                                    <h4>Comments</h4>
+                                    <div class="line"></div>
+                                    <small>You can also comment directly on <a
+                                            href="https://github.com/Eonasdan/blog/issues" target="_blank"
+                                            rel="noopener">GitHub.</a></small>
+                                </div>
+
+                                --comments--
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Widget -->
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="sidebar-area">
+                        <!-- ***** Single Widget ***** -->
+                        <div class="single-widget p-0 author-widget">
+                            <div class="p-4">
+                                <img class="author-avatar" src="https://github.com/eonasdan.png" alt="" width="120"
+                                     height="120"/>
+                                <span class="author-name">Jonathan Peterson (Eonasdan)</span>
+                                <div class="author-social-info">
+                                    <a href="http://twitter.eonasdan.com/" target="_blank" rel="noopener"
+                                       title="Find me on Twitter"><i class="fab fa-twitter"></i></a>
+                                    <a href="http://github.eonasdan.com/" target="_blank" rel="noopener"
+                                       title="Find me on GitHub"><i class="fab fa-github"></i></a>
+                                    <a href="http://twitch.eonasdan.com/" target="_blank" rel="noopener"
+                                       title="Find me on Twitch"><i class="fab fa-twitch"></i></a>
+                                </div>
+                                <p>11+ years of web development experience on the Microsoft tech stack creating both
+                                    internal enterprise applications and public facing websites.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive"
+         aria-atomic="true" id="errorMessage">
+        <div class="d-flex">
+            <div class="toast-body">
+                Save failed
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="areYouSureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                Are you Sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="areYouSureModalClose">Close</button>
+                <button type="button" class="btn btn-primary" id="areYouSureModalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="editor.js"></script>
+<script
+        defer
+        src="https://pro.fontawesome.com/releases/v5.14.0/js/regular.js"
+        integrity="sha384-B8V2/SCNt/naDJB0LkeljUBBYYhGFm/rUVnNsFYlutzbeSTTzVEqxRo8SN3tuHSl"
+        crossorigin="anonymous"
+></script>
+<script defer src="https://pro.fontawesome.com/releases/v5.15.0/js/brands.js"
+        integrity="sha384-9/+MmN+rxOjj2vxT64lR/LgNOBY6rxLSrbB55TIrHl+uHUZdDkMu0uupOnT3Rmqn"
+        crossorigin="anonymous"></script>
+<script
+        defer
+        src="https://pro.fontawesome.com/releases/v5.14.0/js/fontawesome.js"
+        integrity="sha384-XULY2W1C7bGq9gruRvsk8Zyhq33b1/TgBBKzJ+8dzWkJm0kObgcry2qU+Qf+HOZw"
+        crossorigin="anonymous"
+></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js" integrity="sha512-hpZ5pDCF2bRCweL5WoA0/N1elet1KYL5mx3LP555Eg/0ZguaHawxNvEjF6O3rufAChs16HVNhEc6blF/rZoowQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js" integrity="sha512-3oavHcAYV/4pmn+iDuax6ru7dpjKnd+21+SzCQrYdTiYDncloL7QJ3qYvsA9JU0p7ZQjB+DizGeWMm2sUrCzSQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-typescript.min.js" integrity="sha512-N+kq7boI2tzrLEq2oqRGL05eQBPLET0/hPA6/BRRxdLcuZhUS74/J5upuVdWxLPiQHoTZtMQVGQcumxAVJl3gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</body>
+</html>

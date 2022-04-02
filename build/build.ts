@@ -2,15 +2,19 @@ import PostMeta from './PostMeta';
 import Utilities from './utilities';
 import {SiteConfig} from './site-config';
 
-const fs = require('fs');
-const JSDOM = require('jsdom').JSDOM;
-const path = require('path');
-const minifyHtml = require('html-minifier-terser').minify;
+import {promises as fs} from 'fs';
+import {promisify} from 'util';
+import {JSDOM} from 'jsdom';
+import * as path from 'path';
+import {minify as minifyHtml} from 'html-minifier-terser';
+import {minify} from 'terser';
+import * as sass from 'sass';
+
 const dropCss = require('dropcss');
-const cleanCSS = require('clean-css');
-const {minify} = require('terser');
-const sass = require('sass');
-const edjsParser = require('editorjs-parser');
+const edjsParser = require("editorjs-parser");
+const {readFileSync, cp } = require('fs')
+const cpPromise = promisify(cp);
+const CleanCSS = require('clean-css');
 
 export default class Build {
     siteConfig: SiteConfig = null;
@@ -35,22 +39,22 @@ export default class Build {
     baseUrl: string;
 
     constructor() {
-        this.siteConfig = JSON.parse(fs.readFileSync(`./build/site-config.json`, 'utf8'));
+        this.siteConfig = JSON.parse(readFileSync(`./build/site-config.json`, 'utf8'));
         this.subFolder = this.siteConfig.site.subfolder ? `${this.siteConfig.site.subfolder}/` : '';
         this.baseUrl = `${this.siteConfig.site.root}/${this.subFolder}`;
     }
 
-    updateAll() {
-        this.shellTemplate = this.loadTemplate('shell');
-        this.postTemplate = this.postDocument;
-        this.postLoopTemplate = this.loadTemplate(`post-loop`);
+    async updateAllAsync() {
+        this.shellTemplate = await this.loadTemplateAsync('shell');
+        this.postTemplate = await this.postDocumentAsync();
+        this.postLoopTemplate = await this.loadTemplateAsync(`post-loop`);
         this.reset();
-        this.removeDirectory(`./${this.siteConfig.output.main}`, false);
-        this.copyFile();
-        this.update404();
-        this.prepareCss();
-        this.updatePosts();
-        this.minifyJs().then();
+        await this.removeDirectoryAsync(`./${this.siteConfig.output.main}`, false);
+        await this.copyFileAsync();
+        await this.update404Async();
+        await this.prepareCssAsync();
+        await this.updatePostsAsync();
+        this.minifyJsAsync().then();
     }
 
     reset() {
@@ -59,8 +63,8 @@ export default class Build {
         this.siteMap = '';
     }
 
-    loadTemplate(template) {
-        return fs.readFileSync(`./${this.siteConfig.source}/templates/${template}.html`, 'utf8')
+    loadTemplateAsync(template) {
+        return fs.readFile(`./${this.siteConfig.source}/templates/${template}.html`, 'utf8')
     }
 
     getSearchBody(html) {
@@ -73,48 +77,46 @@ export default class Build {
         return Array.from(new Set(bodyPrep)).join(' '); //remove duplicate words
     }
 
-    removeDirectory(directory, removeSelf = true) {
+    async removeDirectoryAsync(directory, removeSelf = true) {
         try {
-            const files = fs.readdirSync(directory) || [];
-            files.forEach(file => {
+            const files = await fs.readdir(directory) || [];
+            for (const file of files) {
                 const filePath = path.join(directory, file);
-                if (fs.statSync(filePath).isFile())
-                    this.removeFile(filePath);
+                if ((await fs.stat(filePath)).isFile())
+                    await this.removeFileAsync(filePath);
                 else
-                    this.removeDirectory(filePath);
-            })
+                    await this.removeDirectoryAsync(filePath);
+            }
         } catch (e) {
             return;
         }
         if (removeSelf)
-            fs.rmdirSync(directory);
+           await fs.rmdir(directory);
     }
 
-    removeFile(filePath) {
-        if (!fs.statSync(filePath).isFile()) return;
+    async removeFileAsync(filePath) {
+        if (!(await fs.stat(filePath)).isFile()) return;
         try {
-            fs.unlinkSync(filePath);
-        } catch (e) {
-
-        }
+            await fs.unlink(filePath);
+        } catch (e) { }
     }
 
-    copyFile(path?: string, destination?: string) {
+    async copyFileAsync(filePath?: string, destination?: string) {
         //copy all
-        if (!path) {
-            fs.cpSync(`./${this.siteConfig.source}/copy`, this.siteConfig.output.main, {recursive: true});
+        if (!filePath) {
+            await cpPromise(`./${this.siteConfig.source}/copy`, this.siteConfig.output.main, {recursive: true});
             return;
         }
-        fs.copyFileSync(path, destination);
+        await fs.copyFile(filePath, destination);
     }
 
-    writeFileAndEnsurePathExists(filePath, content) {
-        fs.mkdirSync(path.dirname(filePath), {recursive: true});
+    async writeFileAndEnsurePathExistsAsync(filePath, content) {
+        await fs.mkdir(path.dirname(filePath), {recursive: true});
 
-        fs.writeFileSync(filePath, content);
+        await fs.writeFile(filePath, content);
     }
 
-    // since everyone has to have their own meta data *rolls eyes* the primary purpose here
+    // since everyone has to have their own metadata *rolls eyes* the primary purpose here
     // is to quickly find similar tags and set them all at once
     setMetaContent(rootElement, selector, content) {
         [...rootElement.getElementsByClassName(selector)].forEach(element => {
@@ -148,45 +150,45 @@ export default class Build {
     }
 
     //read css files
-    prepareCss() {
+    async prepareCssAsync() {
         this.cssWhitelist = new Set();
 
         this.cssWhitelist.add('post-tags');
         this.cssWhitelist.add('mt-30');
 
-        this.css = sass.compile(`./${this.siteConfig.source}/styles/style.scss`).css;
+        this.css = (await sass.compileAsync(`./${this.siteConfig.source}/styles/style.scss`)).css;
     }
 
     //read post template
-    get postDocument() {
-        const indexDocument = new JSDOM(this.loadTemplate('post-template')).window.document;
+    async postDocumentAsync() {
+        const indexDocument = new JSDOM(await this.loadTemplateAsync('post-template')).window.document;
         const shell = this.shellDocument;
         shell.getElementById('mainContent').innerHTML = indexDocument.documentElement.innerHTML;
         return shell.documentElement.innerHTML;
     }
 
-    updatePosts() {
+    async updatePostsAsync() {
         this.reset();
         const postOutput = `./${this.siteConfig.output.main}/${this.siteConfig.output.posts}`;
         //remove old stuff
-        this.removeDirectory(postOutput, false);
+        await this.removeDirectoryAsync(postOutput, false);
 
-        const posts = fs
-            .readdirSync(`./${this.siteConfig.source}/partials`)
+        const posts = (await fs
+            .readdir(`./${this.siteConfig.source}/partials`))
             .filter(file => path.extname(file).toLowerCase() === '.html');
 
-        posts.forEach(file => {
+        for (const file of posts) {
             const fullyQualifiedUrl = `${this.baseUrl}${this.siteConfig.output.posts}/${file}`;
             const fullPath = `./${this.siteConfig.source}/partials/${file}`;
             const newPageDocument = new JSDOM(this.postTemplate).window.document;
-            const postDocument = new JSDOM(fs.readFileSync(fullPath, 'utf8')).window.document;
+            const postDocument = new JSDOM((await fs.readFile(fullPath, 'utf8'))).window.document;
             const article = postDocument.querySelector('article');
             if (!article) {
                 console.error(`failed to read article body for ${fullPath}`);
-                return;
+                continue;
             }
 
-            const fileModified = fs.statSync(fullPath).mtime;
+            const fileModified = (await fs.stat(fullPath)).mtime;
 
             let postMeta = new PostMeta(file, file.replace(path.extname(file), ''), this.getSearchBody(article), fileModified, fileModified);
 
@@ -226,12 +228,11 @@ export default class Build {
 
             newPageDocument.title = postMeta.title;
             if (postMeta.thumbnail) {
-                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'),
-                    `<img src="/${this.subFolder}img/${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="1200"/>`);
-                this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
-                    `<img src="/${this.subFolder}img/${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);
+                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.thumbnail);
+               /* this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
+                    `<img src="/${this.subFolder}img/${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);*/
 
-                const fullyQualifiedImage = `${this.baseUrl}/img/${postMeta.thumbnail}`;
+                const fullyQualifiedImage = `${this.baseUrl}img/${postMeta.thumbnail}`;
                 this.setMetaContent(newPageDocument, 'metaImage', fullyQualifiedImage);
                 this.setStructuredData(structuredData, 'image', [
                     fullyQualifiedImage
@@ -245,7 +246,7 @@ export default class Build {
             this.setMetaContent(newPageDocument, 'metaTitle', postMeta.title);
             this.setStructuredData(structuredData, 'headline', postMeta.title);
             this.setInnerHtml(loopDocument.getElementsByClassName('post-title')[0], postMeta.title);
-            loopDocument.getElementsByClassName('post-link')[0].href = `/${this.subFolder}${this.siteConfig.output.posts}/${postMeta.file}`
+            (loopDocument.getElementsByClassName('post-link')[0] as HTMLLinkElement).href = `/${this.subFolder}${this.siteConfig.output.posts}/${postMeta.file}`
 
             this.setMetaContent(newPageDocument, 'metaDescription', postMeta.excerpt);
             this.setMetaContent(newPageDocument, 'metaUrl', fullyQualifiedUrl);
@@ -275,7 +276,7 @@ export default class Build {
             newPageDocument.getElementsByTagName('body')[0].appendChild(structuredDataTag);
 
             const completeHtml = this.createRootHtml(newPageDocument.documentElement.innerHTML);
-            this.writeFileAndEnsurePathExists(`./${postOutput}/${file}`, completeHtml);
+            await this.writeFileAndEnsurePathExistsAsync(`./${postOutput}/${file}`, completeHtml);
 
             //update pure css
             dropCss({
@@ -295,27 +296,28 @@ export default class Build {
 <lastmod>${updateDate}</lastmod>
 <priority>0.80</priority>
 </url>`;
-        });
+        }
 
-        this.postsMeta = this.postsMeta
+        this.postsMeta
             .sort((a, b) => {
                 return +new Date(a.postDate) > +new Date(b.postDate) ? -1 : 0;
             });
 
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(this.postsMeta, null, 2));
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(this.postsMeta, null, 2));
 
-        this.updateSiteMap();
-        this.updateHomepage();
-        this.cleanCss();
+        await this.updateSiteMapAsync();
+        await this.updateHomepageAsync();
+        await this.cleanCssAsync();
     }
 
-    updateHomepage() {
-        const indexDocument = new JSDOM(fs.readFileSync(`./${this.siteConfig.source}/templates/index.html`, 'utf8')).window.document;
+    async updateHomepageAsync() {
+        const indexDocument = new JSDOM(await fs.readFile(`./${this.siteConfig.source}/templates/index.html`, 'utf8')).window.document;
 
-        indexDocument.getElementById('post-container').innerHTML = this.homePageHtml.sort((a, b) => {
+        this.homePageHtml.sort((a, b) => {
             return new Date(a.postDate).valueOf() > new Date(b.postDate).valueOf() ? -1 : 0;
         })
-            .map(x => x.html).join(' ');
+
+        indexDocument.getElementById('post-container').innerHTML = this.homePageHtml.map(x => x.html).join(' ');
 
         const shell = this.shellDocument;
         shell.getElementById('mainContent').innerHTML = indexDocument.documentElement.innerHTML;
@@ -332,28 +334,28 @@ export default class Build {
         }
 
         const completeHtml = this.createRootHtml(shell.documentElement.innerHTML);
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/index.html`, completeHtml);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/index.html`, completeHtml);
         dropCss({
             css: this.css,
             html: completeHtml
         }).sels.forEach(sel => this.cssWhitelist.add(sel));
     }
 
-    update404() {
-        const indexDocument = new JSDOM(fs.readFileSync(`./${this.siteConfig.source}/templates/404.html`, 'utf8')).window.document;
+    async update404Async() {
+        const indexDocument = new JSDOM(await fs.readFile(`./${this.siteConfig.source}/templates/404.html`, 'utf8')).window.document;
         const shell = this.shellDocument;
         shell.getElementById('mainContent').innerHTML = indexDocument.documentElement.innerHTML;
 
         const completeHtml = this.createRootHtml(shell.documentElement.innerHTML);
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/404.html`, this.createRootHtml(shell.documentElement.innerHTML));
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/404.html`, this.createRootHtml(shell.documentElement.innerHTML));
         dropCss({
             css: this.css,
             html: completeHtml
         }).sels.forEach(sel => this.cssWhitelist.add(sel));
     }
 
-    updateSiteMap() {
-        this.siteMap = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    async updateSiteMapAsync() {
+        this.siteMap = `<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>${this.baseUrl}</loc>
 <lastmod>${new Date().toISOString()}</lastmod>
@@ -361,63 +363,69 @@ export default class Build {
 </url>
 ${this.siteMap}
 </urlset>`;
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/sitemap.xml`, this.siteMap);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/sitemap.xml`, this.siteMap);
     }
 
-    updateCss() {
-        this.prepareCss();
+    async updateCssAsync() {
+        await this.prepareCssAsync();
 
-        const gatherCss = (fullPath) => {
-            const postDocument = new JSDOM(fs.readFileSync(fullPath, 'utf8')).window.document;
+        const gatherCssAsync = async (fullPath) => {
+            const postDocument = new JSDOM(await fs.readFile(fullPath, 'utf8')).window.document;
             dropCss({
                 css: this.css,
                 html: postDocument.documentElement.innerHTML
             }).sels.forEach(sel => this.cssWhitelist.add(sel));
         }
 
-        fs
-            .readdirSync(`./${this.siteConfig.source}/partials`)
+        for (const x of (await fs
+                .readdir(`./${this.siteConfig.source}/partials`)
+        )
             .filter(file => path.extname(file).toLowerCase() === '.html')
-            .map(file => `./${this.siteConfig.source}/partials/${file}`).forEach(gatherCss);
+            .map(file => `./${this.siteConfig.source}/partials/${file}`)) {
+            await gatherCssAsync(x);
+        }
 
-        fs
-            .readdirSync(`./${this.siteConfig.source}/templates`)
+        for (const x of (await fs
+                .readdir(`./${this.siteConfig.source}/templates`)
+        )
             .filter(file => path.extname(file).toLowerCase() === '.html')
-            .map(file => `./${this.siteConfig.source}/templates/${file}`).forEach(gatherCss);
+            .map(file => `./${this.siteConfig.source}/templates/${file}`)) {
+            await gatherCssAsync(x);
+        }
 
-        this.cleanCss();
+        await this.cleanCssAsync();
     }
 
-    cleanCss() {
+    async cleanCssAsync() {
         let cleaned = dropCss({
             html: '',
             css: this.css,
             shouldDrop: sel => !this.cssWhitelist.has(sel),
         });
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/css/style.min.css`, new cleanCSS().minify(cleaned.css).styles);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, new CleanCSS().minify(cleaned.css).styles);
     }
 
-    async minifyJs() {
+    async minifyJsAsync() {
         const loopDocument = new JSDOM(this.postLoopTemplate).window.document;
-        const getJs = () => {
+        const getJsAsync = async () => {
             let output = '';
 
-            const files = fs
-                .readdirSync(`./${this.siteConfig.source}/js`)
+            const files = (await fs
+                .readdir(`./${this.siteConfig.source}/js`))
                 .filter(file => path.extname(file).toLowerCase() === '.js' && !file.includes('.min.'));
 
-            files.forEach(file => {
-                output += fs.readFileSync(`./${this.siteConfig.source}/js/${file}`, 'utf8') + '\r\n';
-            });
+            for (const file of files) {
+                output += (await fs.readFile(`./${this.siteConfig.source}/js/${file}`, 'utf8')) + '\r\n';
+            }
 
             return output;
         }
 
-        const js = getJs().replace('[POSTLOOP]', loopDocument.getElementsByTagName('body')[0].innerHTML);
+        const js = (await getJsAsync()).replace('[POSTLOOP]', loopDocument.getElementsByTagName('body')[0].innerHTML);
 
         const uglified = await minify(js);
 
-        this.writeFileAndEnsurePathExists(`./${this.siteConfig.output.main}/js/bundle.min.js`, uglified.code);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/bundle.min.js`, uglified.code);
     }
 
     setInnerHtml(element, value) {
@@ -445,11 +453,11 @@ ${this.siteMap}
         }
     });
 
-    save(postMeta, rawEditor) {
+    async saveAsync(postMeta, rawEditor) {
         const postImagePath = `./${this.siteConfig.output.main}/img/${postMeta.file}`;
         const partialPath = `./${this.siteConfig.source}/partials/${postMeta.file}.html`;
 
-        if (fs.existsSync(postImagePath)) {
+        if (await fs.stat(postImagePath)) {
             return {
                 success: false,
                 error: 'Post with the same path already exists.'
@@ -457,23 +465,23 @@ ${this.siteMap}
         }
 
         try {
-            fs.mkdirSync(postImagePath);
+            await fs.mkdir(postImagePath);
 
             const postImages = rawEditor.blocks.filter(y => y.type === 'image');
             if (postImages.length > 0) {
-                postImages.forEach(x => {
+                for (const x of postImages) {
                     const newPath = `${postImagePath}/${x.data.file.url.replace('img_temp/', '')}`;
-                    fs.renameSync(`.${x.data.file.url}`, newPath);
+                    await fs.rename(`.${x.data.file.url}`, newPath);
                     x.data.file.url = newPath.substring(1);
-                });
+                }
             }
 
             const body = this.parser.parse(rawEditor);
 
             const newThumbnailPath = `${postImagePath}/${postMeta.thumbnail.replace('img_temp\\', '')}`;
-            fs.renameSync(postMeta.thumbnail, newThumbnailPath);
+            await fs.rename(postMeta.thumbnail, newThumbnailPath);
 
-            let newPost = this.loadTemplate('empty-post')
+            let newPost = (await this.loadTemplateAsync('empty-post'))
                 .replace(/==title==/g, postMeta.title)
                 .replace(/==author-name==/g, postMeta.author.name)
                 .replace(/==formatted-date==/g, Utilities.formatter.format(postMeta.postDate))
@@ -484,23 +492,21 @@ ${this.siteMap}
                 .replace(/==excerpt==/g, postMeta.excerpt)
                 .replace(/==author-url==/g, postMeta.author.url);
 
-            this.writeFileAndEnsurePathExists(partialPath, newPost);
+            await this.writeFileAndEnsurePathExistsAsync(partialPath, newPost);
 
-            this.removeDirectory('./img_temp', false);
+            await this.removeDirectoryAsync('./img_temp', false);
             return {
                 success: true,
                 post: `/posts/${postMeta.file}.html`
             }
 
         } catch (e) {
-            this.removeDirectory(postImagePath, true);
-            this.removeFile(partialPath);
+            await this.removeDirectoryAsync(postImagePath, true);
+            await  this.removeFileAsync(partialPath);
             return {
                 success: false,
                 error: e
             }
         }
     }
-
-
 }

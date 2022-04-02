@@ -5,7 +5,7 @@ export default class Utilities {
         day: "numeric",
     });
 
-    static log = (message) => {
-        console.log(`[Make ${Utilities.formatter.format(new Date())}] ${message}`)
+    static log = (message, prefix = 'Make') => {
+        console.log(`[${prefix} ${Utilities.formatter.format(new Date())}] ${message}`)
     }
 }
