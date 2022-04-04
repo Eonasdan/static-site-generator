@@ -17,14 +17,14 @@ export default class Images {
         
         for (let responsiveImage of imageResult) {
             let pictureTag = '<picture>\n';
-            const sortedWidths = responsiveImage.sizedImages
+            responsiveImage.sizedImages
                 .sort((a, b) => a.width < b.width ? 1 : -1);
 
-            for (let i = 0; i < sortedWidths.length; i++) {
-                const current = sortedWidths[i];
-                if (i + 1 >= sortedWidths.length) {
+            for (let i = 0; i < responsiveImage.sizedImages.length; i++) {
+                const current = responsiveImage.sizedImages[i];
+                if (i + 1 >= responsiveImage.sizedImages.length) {
                     pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
-                    pictureTag += `<img src="${config.sourceSetPath}/${sortedWidths[0].file}" alt="${alt}"/>\n`;
+                    pictureTag += `<img src="${config.sourceSetPath}/${responsiveImage.sizedImages[0].file}" alt="${alt}"/>\n`;
                     break;
                 }
                 pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;

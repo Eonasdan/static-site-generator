@@ -228,11 +228,11 @@ export default class Build {
 
             newPageDocument.title = postMeta.title;
             if (postMeta.thumbnail) {
-                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.thumbnail);
-               /* this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
-                    `<img src="/${this.subFolder}img/${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);*/
+                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.thumbnail.innerHTML);
+                this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
+                    `<img src="${postMeta.thumbnail.getElementsByTagName('source')[3].srcset}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);
 
-                const fullyQualifiedImage = `${this.baseUrl}img/${postMeta.thumbnail}`;
+                const fullyQualifiedImage = `${this.baseUrl}${postMeta.thumbnail.getElementsByTagName('source')[0].srcset}`;
                 this.setMetaContent(newPageDocument, 'metaImage', fullyQualifiedImage);
                 this.setStructuredData(structuredData, 'image', [
                     fullyQualifiedImage
@@ -402,7 +402,10 @@ ${this.siteMap}
             css: this.css,
             shouldDrop: sel => !this.cssWhitelist.has(sel),
         });
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, new CleanCSS().minify(cleaned.css).styles);
+        const cleanedCss = new CleanCSS({sourceMap: true}).minify(cleaned.css);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css`, cleaned.css);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, cleanedCss.styles);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css.map`, cleanedCss.sourceMap);
     }
 
     async minifyJsAsync() {

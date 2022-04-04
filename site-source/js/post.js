@@ -11,10 +11,14 @@ const urlParams = new URLSearchParams(window.location.search);
 const term = urlParams.get('search');
 if (term) {
     document.getElementById('search').value = term;
-    fetch('/posts/posts.json')
+    const termLower = term.toLowerCase();
+    fetch('/js/search.json')
         .then(response => response.json())
         .then(data => {
-            showPosts(data.filter(x => x.title.toLowerCase().includes(term.toLowerCase()) || x.body.toLowerCase().includes(term.toLowerCase())));
+            if (term.startsWith('tag:'))
+                showPosts(data.filter(x => x.tags.includes(termLower.replace('tag:', ''))));
+            else
+                showPosts(data.filter(x => x.title.toLowerCase().includes(termLower) || x.body.includes(termLower)));
         });
 }
 
@@ -23,4 +27,4 @@ function onLinkClick(e) {
     window.location.href = e.target.href;
 }
 
-[...document.querySelectorAll('.vizew-pager .post-title')].forEach(element => element.addEventListener('click', onLinkClick));
+[...document.querySelectorAll('.pager .post-title')].forEach(element => element.addEventListener('click', onLinkClick));

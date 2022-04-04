@@ -6,13 +6,13 @@ export default class PostMeta {
     body: string;
     postDate: Date;
     updateDate: Date;
-    thumbnail: string;
+    thumbnail: HTMLElement;
     excerpt: string;
     tags = '';
     author: PostAuthor;
 
     constructor(file = '', title = '', body = '', postDate = undefined, updateDate = undefined,
-                thumbnail = '', excerpt = '', tags = '', author = new PostAuthor()) {
+                thumbnail = undefined, excerpt = '', tags = '', author = new PostAuthor()) {
         this.file = file;
         this.title = title;
         this.body = body;
@@ -29,8 +29,8 @@ export default class PostMeta {
         const title = metaTag.querySelector('#title')?.innerHTML;
         if (title) this.title = title.trim();
 
-        const thumbnail = metaTag.querySelector('#thumbnail')?.innerHTML;
-        if (thumbnail) this.thumbnail = thumbnail.trim();
+        const thumbnail = metaTag.querySelector('#thumbnail');
+        if (thumbnail.childNodes.length !== 0) this.thumbnail = <HTMLElement>thumbnail;
 
         const postDate = metaTag.querySelector('#post-date')?.innerHTML;
         if (postDate) this.postDate = new Date(postDate.trim());

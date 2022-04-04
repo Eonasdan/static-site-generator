@@ -128,28 +128,25 @@ export class Watcher {
             ignoreInitial: true
         });
 
-        let lastChange = '';
-        let lastChangeFile = '';
-
-        const handleChange = async (event, path) => {
-            Utilities.log(`${event}: ${path}`);
-            if (path.startsWith(partials)) {
+        const handleChange = async (event, change) => {
+            Utilities.log(`${event}: ${change}`);
+            if (change.startsWith(partials)) {
                 await this.builder.updatePostsAsync();
             }
-            if (path.startsWith(styles)) {
+            if (change.startsWith(styles)) {
                 await this.builder.updateCssAsync();
             }
-            if (path.startsWith(templates)) {
+            if (change.startsWith(templates)) {
                 await this.builder.updateAllAsync();
             }
-            if (path.startsWith(js)) {
+            if (change.startsWith(js)) {
                 await this.builder.minifyJsAsync();
             }
-            if (path.startsWith(copy)) {
-                const destination = path.replace(copy, main)
+            if (change.startsWith(copy)) {
+                const destination = change.replace(copy, main)
                 switch (event) {
                     case 'add':
-                        await this.builder.copyFileAsync(path, destination);
+                        await this.builder.copyFileAsync(change, destination);
                         break;
                     case 'unlink':
                         await this.builder.removeFileAsync(destination);
@@ -158,8 +155,6 @@ export class Watcher {
             }
             Utilities.log('Update successful');
             this.cleanTimer(this.refreshBrowser.bind(this));
-            lastChange = Utilities.formatter.format(new Date());
-            lastChangeFile = path;
             console.log('');
         }
 
