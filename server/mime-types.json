@@ -1838,7 +1838,7 @@
     "type": "application/json",
     "name": "JavaScript Object Notation (JSON)",
     "extensions": [
-      "json"
+      "json", "map"
     ]
   },
   {

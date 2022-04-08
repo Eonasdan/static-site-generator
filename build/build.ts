@@ -32,6 +32,7 @@ export default class Build {
 // prepare site map
     siteMap = '';
 
+    sourceMap = '';
     css = '';
     cssWhitelist = new Set();
 
@@ -134,8 +135,8 @@ export default class Build {
         structure[property] = value;
     }
 
-    createRootHtml(html) {
-        html = minifyHtml(html, {
+    async createRootHtmlAsync(html) {
+        html = await minifyHtml(html, {
             collapseWhitespace: true,
             removeComments: true
         });
@@ -156,7 +157,9 @@ export default class Build {
         this.cssWhitelist.add('post-tags');
         this.cssWhitelist.add('mt-30');
 
-        this.css = (await sass.compileAsync(`./${this.siteConfig.source}/styles/style.scss`)).css;
+        const compileResult = await sass.compileAsync(`./${this.siteConfig.source}/styles/style.scss`, {sourceMap: true});
+        this.sourceMap = compileResult.sourceMap.mappings;
+        this.css = compileResult.css;
     }
 
     //read post template
@@ -275,7 +278,7 @@ export default class Build {
             structuredDataTag.innerHTML = JSON.stringify(structuredData, null, 2);
             newPageDocument.getElementsByTagName('body')[0].appendChild(structuredDataTag);
 
-            const completeHtml = this.createRootHtml(newPageDocument.documentElement.innerHTML);
+            const completeHtml = await this.createRootHtmlAsync(newPageDocument.documentElement.innerHTML);
             await this.writeFileAndEnsurePathExistsAsync(`./${postOutput}/${file}`, completeHtml);
 
             //update pure css
@@ -307,7 +310,7 @@ export default class Build {
 
         await this.updateSiteMapAsync();
         await this.updateHomepageAsync();
-        await this.cleanCssAsync();
+        await this.updateCssAsync();
     }
 
     async updateHomepageAsync() {
@@ -333,7 +336,7 @@ export default class Build {
             shell.body.appendChild(el);
         }
 
-        const completeHtml = this.createRootHtml(shell.documentElement.innerHTML);
+        const completeHtml = await this.createRootHtmlAsync(shell.documentElement.innerHTML);
         await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/index.html`, completeHtml);
         dropCss({
             css: this.css,
@@ -346,8 +349,8 @@ export default class Build {
         const shell = this.shellDocument;
         shell.getElementById('mainContent').innerHTML = indexDocument.documentElement.innerHTML;
 
-        const completeHtml = this.createRootHtml(shell.documentElement.innerHTML);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/404.html`, this.createRootHtml(shell.documentElement.innerHTML));
+        const completeHtml = await this.createRootHtmlAsync(shell.documentElement.innerHTML);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/404.html`, await this.createRootHtmlAsync(shell.documentElement.innerHTML));
         dropCss({
             css: this.css,
             html: completeHtml
@@ -397,15 +400,22 @@ ${this.siteMap}
     }
 
     async cleanCssAsync() {
-        let cleaned = dropCss({
+        const sourceMapComment = "/*# sourceMappingURL=style.css.map */"
+
+        let optimized = dropCss({
             html: '',
             css: this.css,
             shouldDrop: sel => !this.cssWhitelist.has(sel),
-        });
-        const cleanedCss = new CleanCSS({sourceMap: true}).minify(cleaned.css);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css`, cleaned.css);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, cleanedCss.styles);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css.map`, cleanedCss.sourceMap);
+        }).css;
+
+        optimized += sourceMapComment;
+
+        let cleanedCss = new CleanCSS().minify(optimized).styles;
+        cleanedCss += sourceMapComment;
+
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css`, optimized);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, cleanedCss);
+        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css.map`, this.sourceMap);
     }
 
     async minifyJsAsync() {
@@ -450,9 +460,15 @@ ${this.siteMap}
                 case 'js':
                     codeClass = 'language-javascript'
                     break;
+                case 'typescript':
+                    codeClass = 'language-typescript'
+                    break;
             }
 
             return `<pre><code class="${codeClass}">${sanitizeHtml(data.code)}</code></pre>`
+        },
+        img: (data) => {
+            debugger;
         }
     });
 
@@ -460,7 +476,7 @@ ${this.siteMap}
         const postImagePath = `./${this.siteConfig.output.main}/img/${postMeta.file}`;
         const partialPath = `./${this.siteConfig.source}/partials/${postMeta.file}.html`;
 
-        if (await fs.stat(postImagePath)) {
+        if (await fs.stat(partialPath)) {
             return {
                 success: false,
                 error: 'Post with the same path already exists.'

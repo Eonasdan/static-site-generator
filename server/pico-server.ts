@@ -101,10 +101,10 @@ export default class PicoServer {
         });
     }
 
-     async defaultHandler(req: IncomingMessage, res: ServerResponse, directory?: string, addSocket = true) {
+    async defaultHandler(req: IncomingMessage, res: ServerResponse, directory?: string, addSocket = true) {
         let url = req.url;
-        if (url.endsWith('/')) url += 'index.html'
-         directory = directory || this.directory;
+        if (url.endsWith('/')) url += 'index.html';
+        directory = directory || this.directory;
         if (this.sub) {
             directory = directory.replace(this.sub, '');
             url = url.replace(this.sub, '');

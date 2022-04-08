@@ -84,6 +84,9 @@ export class Watcher {
         }
     }
 
+    /*
+    Called when clicking save in the editor
+     */
     async editorSaveAsync(req: IncomingMessage, res: ServerResponse, next: Next) {
         const form = formidable({multiples: true, keepExtensions: true, uploadDir: './img_temp'});
         form.parse(req, async (err, fields, files) => {

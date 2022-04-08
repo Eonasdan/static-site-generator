@@ -77,6 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const fileReader = new FileReader();
+    fileReader.addEventListener("load", (e) => {
+        document.querySelector('#post-thumbnail img').src = e.target.result;
+    }, false);
+
     function onSave() {
         editor.save().then(data => {
             if (data) {
@@ -103,9 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('draft-editor', JSON.stringify(data));
                 //return;
             }
-            /*document.getElementById('mustHaveData').classList.add('show');
-            saveModalButton.setAttribute("disabled", "true");
-            previewButton.setAttribute("disabled", "true");*/
         });
     }
 
@@ -145,14 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
         })).json();
         if (response.success) {
             setTimeout(() => {
-                //todo toast.
+                const toast = new bootstrap.Toast(document.getElementById('successMessage'));
+                toast.show();
                 window.location.href = response.post;
             }, 1.5 * 1000);
         } else {
-            const toast = new bootstrap.Toast(document.getElementById('errorMessage'));
-            toast.show();
+            const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
+            errorToast.show();
         }
-        //todo do something here. need to check success or failure. redirect to post? need to allow overwrite? special if edit works
     });
 
     document.getElementById('clearButton').addEventListener('click', () => {
@@ -193,12 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'thumbnail':
                 if (input?.files?.length === 0) return;
 
-                const reader = new FileReader();
-                reader.addEventListener("load", (e) => {
-                    document.querySelector('#post-thumbnail img').src = e.target.result;
-                }, false);
-
-                reader.readAsDataURL(input.files[0]); //todo should probably move this so it's not recreated every time
+                fileReader.readAsDataURL(input.files[0]);
                 break;
             case 'postDate':
                 outputDiv.getElementsByClassName('post-date')[0].innerText = formatter.format(new Date(input.value));
