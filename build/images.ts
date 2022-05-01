@@ -11,20 +11,21 @@ import {promises as fs} from 'fs';
 
 export default class Images {
 
-    async generateSourceSetAsync(config: ImageGenerateConfig, alt = '') {
-        const pictureTags: string[] = [];
+    async generateSourceSetAsync(config: ImageGenerateConfig, alt: string[] = []): Promise<PictureSet[]> {
+        const pictureTags: PictureSet[] = [];
         const imageResult = await this.generateResponsiveImagesAsync(config);
         
-        for (let responsiveImage of imageResult) {
+        for (let i = 0; i < imageResult.length; i++){
+            let responsiveImage = imageResult[i];
             let pictureTag = '<picture>\n';
             responsiveImage.sizedImages
                 .sort((a, b) => a.width < b.width ? 1 : -1);
 
-            for (let i = 0; i < responsiveImage.sizedImages.length; i++) {
-                const current = responsiveImage.sizedImages[i];
-                if (i + 1 >= responsiveImage.sizedImages.length) {
+            for (let j = 0; j < responsiveImage.sizedImages.length; j++) {
+                const current = responsiveImage.sizedImages[j];
+                if (j + 1 >= responsiveImage.sizedImages.length) {
                     pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
-                    pictureTag += `<img src="${config.sourceSetPath}/${responsiveImage.sizedImages[0].file}" alt="${alt}"/>\n`;
+                    pictureTag += `<img src="${config.sourceSetPath}/${responsiveImage.sizedImages[0].file}" alt="${alt[i]}"/>\n`;
                     break;
                 }
                 pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
@@ -32,14 +33,17 @@ export default class Images {
             
             pictureTag += '</picture>';
 
-            pictureTags.push(pictureTag);
+            pictureTags.push({
+                file: responsiveImage.file,
+                pictureTag
+            });
         }
 
         return pictureTags;
     }
 
 
-    async generateResponsiveImagesAsync(config: ImageGenerateConfig) {
+    async generateResponsiveImagesAsync(config: ImageGenerateConfig): Promise<ResponsiveImages[]> {
         const files: ResponsiveImages[] = []
         config.sharpConfig = Images.mergeConfig(config.sharpConfig);
 
@@ -90,7 +94,8 @@ export default class Images {
 
                 if (sharpConfig.errorOnEnlargement) {
                     throw Error(message)
-                } else if (sharpConfig.skipOnEnlargement) {
+                }
+                if (sharpConfig.skipOnEnlargement) {
                     if (!sharpConfig.silent) {
                         Utilities.log(`(skip for processing)`, msgPrefix)
                     }
@@ -211,19 +216,19 @@ export default class Images {
             return null
         }
         if (typeof neededSize === 'string' && neededSize.indexOf('%') > -1) {
-            const percentage = parseFloat(neededSize)
+            const percentage = parseFloat(neededSize);
 
             if (isNaN(percentage)) {
-                throw new Error(`Wrong percentage size "${neededSize}"`)
+                throw new Error(`Wrong percentage size "${neededSize}"`);
             }
 
-            return Math.round(originalSize * percentage * 0.01)
+            return Math.round(originalSize * percentage * 0.01);
         }
 
-        neededSize = parseInt(neededSize)
+        neededSize = parseInt(neededSize);
 
         if (isNaN(neededSize)) {
-            throw new Error(`Wrong size "${neededSize}"`)
+            throw new Error(`Wrong size "${neededSize}"`);
         }
 
         return neededSize
@@ -287,7 +292,7 @@ export default class Images {
             skipOnEnlargement: true
         };
 
-        return Object.assign({}, defaultConfig, config)
+        return Object.assign({}, defaultConfig, config);
     }
 }
 
@@ -356,4 +361,9 @@ export type ResponsiveImages = {
         file: string;
         width: number;
     }[]
+}
+
+export type PictureSet = {
+    file: string;
+    pictureTag: string;
 }

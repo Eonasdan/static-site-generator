@@ -29,7 +29,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/editorjs-image-alt@latest/dist/bundle.js"></script>
+    h
     <script src="https://cdn.jsdelivr.net/gh/paraswaykole/editor-js-code@latest/dist/bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/editorjs-parser@1/build/Parser.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.3.1/dist/bundle.min.js"></script>
@@ -80,6 +81,10 @@
                                     <label for="thumbnail" class="form-label">Thumbnail</label>
                                     <input class="form-control" type="file" id="thumbnail" name="thumbnail"
                                            accept="image/*"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="thumbnailAlt" class="form-label">Thumbnail Alt Text</label>
+                                    <input class="form-control" type="text" id="thumbnailAlt" name="thumbnailAlt"/>
                                 </div>
                                 <div class="mb-3">
                                     <label for="postDate" class="form-label">Post Date</label>
@@ -143,7 +148,7 @@
             <div class="row">
                 <div class="col-12">
                     <div id="post-thumbnail" class="post-details-thumb mb-50">
-                        <img src="https://placekitten.com/1200/615" alt="Building a Small Date library" class="img-fluid" width="1200">
+                        <img src="https://placekitten.com/1200/615" alt="" class="img-fluid" width="1200">
                     </div>
                 </div>
             </div>
@@ -158,14 +163,15 @@
                                     <div class="post-content mt-0">
                                         <h1 class="post-title mb-2">--Title--</h1>
 
-                                        <div class="d-flex justify-content-between mb-30">
-                                            <div class="post-meta d-flex align-items-center">
-                                                <span class="post-author">--Author--</span>
-                                                <i class="far fa-circle" aria-hidden="true"></i>
-                                                <span class="post-date">--Post Date--</span>
+                                        <div class="col-5 mb-30">
+                                            <div class="post-meta d-flex justify-content-between align-items-center">
+                                                <span class="post-author d-flex">--Author--</span>
+                                                <i class="fa-solid fa-circle d-flex" aria-hidden="true"></i>
+                                                <span class="post-date d-flex">--Post Date--</span>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div id="previewContent">
 
                                     </div>
@@ -207,8 +213,6 @@
                                     <a href="[REPLACEME]" target="_blank" rel="noopener"
                                        title="Find me on Twitch"><i class="fab fa-twitch" aria-hidden="true"></i></a>
                                 </div>
-                                <p>11+ years of web development experience on the Microsoft tech stack creating both
-                                    internal enterprise applications and public facing websites.</p>
                             </div>
                         </div>
                     </div>
@@ -249,11 +253,21 @@
                     aria-label="Close"></button>
         </div>
     </div>
-    <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive"
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
          aria-atomic="true" id="successMessage">
         <div class="d-flex">
             <div class="toast-body">
                 Save successful.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="toast align-items-center text-white bg-info border-0" role="alert" aria-live="assertive"
+         aria-atomic="true" id="savingMessage">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fa-solid fa-floppy-disk fa-beat" aria-hidden="true"></i> Saving...
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
                     aria-label="Close"></button>

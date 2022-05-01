@@ -5,11 +5,11 @@ import * as path from 'path';
 const chokidar = require('chokidar');
 
 import PicoServer from '../server/pico-server';
-import {Next} from '../server/middleware';
 import Build from './build';
-import PostMeta from './PostMeta';
-import PostAuthor from './PostAuthor';
+import PostMeta from './models/PostMeta';
+import PostAuthor from './models/PostAuthor';
 import Utilities from './utilities';
+import {EditorModel} from "./models/editor-model";
 
 export class Watcher {
     private pico: PicoServer;
@@ -28,11 +28,11 @@ export class Watcher {
             sub: this.builder.siteConfig.site.subfolder,
             middlewares: [
                 {
-                    middleware: this.uploadMiddlewareAsync,
+                    middleware: this.uploadMiddlewareAsync.bind(this),
                     route: '/editor/uploadFile'
                 },
                 {
-                    middleware: this.editorSaveAsync,
+                    middleware: this.editorSaveAsync.bind(this),
                     route: '/editor/save'
                 },
                 {
@@ -87,22 +87,33 @@ export class Watcher {
     /*
     Called when clicking save in the editor
      */
-    async editorSaveAsync(req: IncomingMessage, res: ServerResponse, next: Next) {
+    async editorSaveAsync(req: IncomingMessage, res: ServerResponse) {
         const form = formidable({multiples: true, keepExtensions: true, uploadDir: './img_temp'});
-        form.parse(req, async (err, fields, files) => {
-            const slug = fields.title.toLowerCase().replace(/ /g, '-')
-                .replace(/[^\w-]+/g, '');
 
-            const editor = JSON.parse(fields.editor);
-            const postDate = new Date(fields.postDate);
-
-            const result = await this.builder.saveAsync(new PostMeta(slug, fields.title,
-                '', postDate, postDate, files.thumbnail.path,
-                fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl)
-            ), editor);
-
-            res.end(JSON.stringify(result));
+        const fields: EditorModel = await new Promise(function (resolve, reject) {
+            form.parse(req, function (err, fieldsArray, files) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                const editorModel: EditorModel = {} as EditorModel;
+                Object.keys(fieldsArray).forEach(x => (editorModel[x] = fieldsArray[x][0]));
+                editorModel.thumbnail = files.thumbnail[0].filepath;
+                resolve(editorModel);
+            }); // form.parse
         });
+
+        const slug = Utilities.slugify(fields.title);
+
+        const editor = JSON.parse(fields.editor);
+        const postDate = new Date(fields.postDate);
+
+        const result = await this.builder.saveAsync(new PostMeta(slug, fields.title,
+            '', postDate, postDate, '',
+            fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl),
+        ), fields.thumbnail, fields.thumbnailAlt, editor);
+
+        res.end(JSON.stringify(result));
     }
 
     async loadEditorAsync(req: IncomingMessage, res: ServerResponse) {
@@ -132,6 +143,7 @@ export class Watcher {
         });
 
         const handleChange = async (event, change) => {
+            if (this.builder.saveInProgress) return;
             Utilities.log(`${event}: ${change}`);
             if (change.startsWith(partials)) {
                 await this.builder.updatePostsAsync();

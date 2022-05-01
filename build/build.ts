@@ -1,6 +1,6 @@
-import PostMeta from './PostMeta';
+import PostMeta from './models/PostMeta';
 import Utilities from './utilities';
-import {SiteConfig} from './site-config';
+import {SiteConfig} from './models/site-config';
 
 import {promises as fs} from 'fs';
 import {promisify} from 'util';
@@ -9,14 +9,17 @@ import * as path from 'path';
 import {minify as minifyHtml} from 'html-minifier-terser';
 import {minify} from 'terser';
 import * as sass from 'sass';
+import Images, {defaultSizes} from "./images";
+import {EditorModel} from "./models/editor-model";
 
 const dropCss = require('dropcss');
 const edjsParser = require("editorjs-parser");
-const {readFileSync, cp } = require('fs')
+const {readFileSync, cp} = require('fs')
 const cpPromise = promisify(cp);
 const CleanCSS = require('clean-css');
 
 export default class Build {
+    saveInProgress = false;
     siteConfig: SiteConfig = null;
     shellTemplate = '';
     postTemplate = '';
@@ -38,6 +41,7 @@ export default class Build {
 
     subFolder: string;
     baseUrl: string;
+    imageProcessor = new Images();
 
     constructor() {
         this.siteConfig = JSON.parse(readFileSync(`./build/site-config.json`, 'utf8'));
@@ -65,7 +69,7 @@ export default class Build {
     }
 
     loadTemplateAsync(template) {
-        return fs.readFile(`./${this.siteConfig.source}/templates/${template}.html`, 'utf8')
+        return fs.readFile(`./${this.siteConfig.source}/templates/${template}.html`, 'utf8');
     }
 
     getSearchBody(html) {
@@ -92,14 +96,15 @@ export default class Build {
             return;
         }
         if (removeSelf)
-           await fs.rmdir(directory);
+            await fs.rmdir(directory);
     }
 
     async removeFileAsync(filePath) {
         if (!(await fs.stat(filePath)).isFile()) return;
         try {
             await fs.unlink(filePath);
-        } catch (e) { }
+        } catch (e) {
+        }
     }
 
     async copyFileAsync(filePath?: string, destination?: string) {
@@ -128,7 +133,7 @@ export default class Build {
         });
     }
 
-    // doing this as a function so I don't have to null check values inline
+    // doing this as a function so that I don't have to null check values inline
     setStructuredData(structure, property, value) {
         if (!value) return;
 
@@ -441,6 +446,15 @@ ${this.siteMap}
         await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/bundle.min.js`, uglified.code);
     }
 
+    async getPictureSet(image: string, destination: string, folder: string, alt: string) {
+       return (await this.imageProcessor.generateSourceSetAsync({
+            images: [image],
+            sizes: defaultSizes,
+            destinationDirectory: destination,
+            sourceSetPath: `/${this.subFolder}img/${folder}`
+        }, [alt]))[0];
+    }
+
     setInnerHtml(element, value) {
         if (!element) return;
         element.innerHTML = value;
@@ -467,46 +481,71 @@ ${this.siteMap}
 
             return `<pre><code class="${codeClass}">${sanitizeHtml(data.code)}</code></pre>`
         },
-        img: (data) => {
-            debugger;
+        image: (data) => {
+            return data.pictureSet;
         }
     });
 
-    async saveAsync(postMeta, rawEditor) {
-        const postImagePath = `./${this.siteConfig.output.main}/img/${postMeta.file}`;
+    async fileExists(file): Promise<boolean> {
+        try {
+            return !!await fs.stat(file);
+        } catch (err) {
+            return false;
+        }
+
+    }
+
+    async saveAsync(postMeta: PostMeta, thumbnail: string, thumbnailAlt: string, rawEditor) {
+        const postImagePath = `./${this.siteConfig.source}/copy/img/${postMeta.file}`;
         const partialPath = `./${this.siteConfig.source}/partials/${postMeta.file}.html`;
 
-        if (await fs.stat(partialPath)) {
+        try {
+            let exists = await this.fileExists(partialPath);
+            if (exists) {
+                return {
+                    success: false,
+                    error: 'Post with the same path already exists.'
+                }
+            }
+        } catch {
             return {
                 success: false,
-                error: 'Post with the same path already exists.'
+                error: 'Something went wrong.'
             }
         }
 
-        try {
-            await fs.mkdir(postImagePath);
+        this.saveInProgress = true;
 
+        try {
             const postImages = rawEditor.blocks.filter(y => y.type === 'image');
+
+            await fs.mkdir(postImagePath, {recursive: true});
+
             if (postImages.length > 0) {
-                for (const x of postImages) {
-                    const newPath = `${postImagePath}/${x.data.file.url.replace('img_temp/', '')}`;
-                    await fs.rename(`.${x.data.file.url}`, newPath);
-                    x.data.file.url = newPath.substring(1);
+                for (const image of postImages) {
+                    const imageName = Utilities.slugify(image.data.alt) || path.basename(image.data.file.url);
+                    const newPath = `${postImagePath}/${imageName}${path.extname(image.data.file.url)}`;
+                    await fs.rename(`.${image.data.file.url}`, newPath);
+                    image.data.file.url = newPath.substring(1);
+
+                    image.data.pictureSet = (await this.getPictureSet(newPath, postImagePath, postMeta.file, image.data.alt)).pictureTag;
                 }
             }
 
             const body = this.parser.parse(rawEditor);
 
-            const newThumbnailPath = `${postImagePath}/${postMeta.thumbnail.replace('img_temp\\', '')}`;
-            await fs.rename(postMeta.thumbnail, newThumbnailPath);
+            const newThumbnailPath = `${postImagePath}/${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
+            await fs.rename(thumbnail, newThumbnailPath);
+
+            const thumbnailPictureSet = await this.getPictureSet(newThumbnailPath, postImagePath, postMeta.file, thumbnailAlt);
 
             let newPost = (await this.loadTemplateAsync('empty-post'))
                 .replace(/==title==/g, postMeta.title)
                 .replace(/==author-name==/g, postMeta.author.name)
                 .replace(/==formatted-date==/g, Utilities.formatter.format(postMeta.postDate))
                 .replace(/==body==/g, body)
-                .replace(/==thumbnail==/g, newThumbnailPath.replace(`./${this.siteConfig.output.main}/img`, ''))
-                .replace(/==raw-post-date==/g, postMeta.postDate)
+                .replace(/==thumbnail==/g, thumbnailPictureSet.pictureTag)
+                .replace(/==raw-post-date==/g, postMeta.postDate.toISOString())
                 .replace(/==tags==/g, postMeta.tags)
                 .replace(/==excerpt==/g, postMeta.excerpt)
                 .replace(/==author-url==/g, postMeta.author.url);
@@ -514,14 +553,18 @@ ${this.siteMap}
             await this.writeFileAndEnsurePathExistsAsync(partialPath, newPost);
 
             await this.removeDirectoryAsync('./img_temp', false);
+            await this.updateAllAsync();
+            this.saveInProgress = false;
             return {
                 success: true,
-                post: `/posts/${postMeta.file}.html`
+                post: `/${this.subFolder}posts/${postMeta.file}.html`
             }
 
         } catch (e) {
+            this.saveInProgress = false;
+            console.error(e);
             await this.removeDirectoryAsync(postImagePath, true);
-            await  this.removeFileAsync(partialPath);
+            await this.removeFileAsync(partialPath);
             return {
                 success: false,
                 error: e

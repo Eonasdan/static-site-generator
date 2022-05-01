@@ -1,3 +1,4 @@
+/* global Header, Checklist, List, ImageTool, CodeTool, InlineCode */
 document.addEventListener('DOMContentLoaded', () => {
 
     const previewButton = document.getElementById('previewButton');
@@ -141,18 +142,30 @@ document.addEventListener('DOMContentLoaded', () => {
         form.classList.add('was-validated');
         const formData = new FormData(form);
         formData.append('editor', JSON.stringify(outputData));
-        const response = await (await fetch('/editor/save', {
-            method: 'POST',
-            body: formData
-        })).json();
-        if (response.success) {
-            setTimeout(() => {
+
+        const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
+        const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'));
+        savingToast.show();
+
+        try {
+            const response = await (await fetch('/editor/save', {
+                method: 'POST',
+                body: formData
+            })).json();
+            if (response.success) {
+                savingToast.hide();
                 const toast = new bootstrap.Toast(document.getElementById('successMessage'));
                 toast.show();
-                window.location.href = response.post;
-            }, 1.5 * 1000);
-        } else {
-            const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
+                setTimeout(() => {
+                    window.location.href = response.post;
+                }, 1.5 * 1000);
+            } else {
+                savingToast.hide();
+                errorToast.show();
+            }
+        }
+        catch (e) {
+            console.log(e);
             errorToast.show();
         }
     });

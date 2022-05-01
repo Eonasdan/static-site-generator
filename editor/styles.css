@@ -81,7 +81,7 @@
 .ce-block--selected .ce-block__content, .ce-inline-toolbar,
 .codex-editor--narrow .ce-toolbox,
 .ce-conversion-toolbar, .ce-settings, .ce-settings__button,
-.ce-toolbar__settings-btn, .cdx-button {
+.ce-toolbar__settings-btn, .cdx-button, .ce-popover, .ce-toolbar__plus:hover {
     background: #007991;
     color: inherit;
 }
@@ -95,7 +95,7 @@
 }
 
 .cdx-settings-button:hover, .ce-settings__button:hover, .ce-toolbox__button--active, .ce-toolbox__button:hover,
-.cdx-button:hover, .ce-inline-toolbar__dropdown:hover, .ce-inline-tool:hover {
+.cdx-button:hover, .ce-inline-toolbar__dropdown:hover, .ce-inline-tool:hover, .ce-popover__item:hover, .ce-toolbar__settings-btn:hover {
     background-color: #439A86;
     color: inherit;
 }

@@ -68,7 +68,8 @@ export default class PicoServer {
             const matching = this.middlewares.filter(x => x.pattern.test(req.url)).map(x => x.middleware);
             for (let middleware of matching) {
                 next.reset();
-                await middleware(req, res, next);
+
+                await middleware(req, res, next).catch(console.error);
 
                 if (next.status() === false) {
                     break;
@@ -130,7 +131,7 @@ export default class PicoServer {
                 .includes(path.extname(url).replace('.', '')))?.type;
             if (!mimeType) {
                 mimeType = 'text/html';
-                console.warn(`Couldn't determine mimetype for ${url}. Defaulting to html`)
+                console.warn(`Couldn't determine mimetype for ${path.extname(url)}. Defaulting to html`)
             }
 
             const complete = (input) => {

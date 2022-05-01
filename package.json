@@ -2,7 +2,8 @@
   "name": "blog",
   "version": "1.0.0",
   "scripts": {
-    "start": "npm run rollup && node ./ts-out/make.js --watch",
+    "start": "npm run rollup && npm run watch",
+    "watch": "node ./ts-out/make.js --watch",
     "build": "npm run rollup && node ./ts-out/make.js --pwa",
     "rollup": "rollup -c ./build/rollup.config.js"
   },
@@ -26,7 +27,7 @@
     "jsdom": "^19.0.0",
     "rollup": "^2.70.1",
     "rollup-plugin-copy": "^3.4.0",
-    "sass": "^1.49.11",
+    "sass": "^1.50.0",
     "socket.io": "^4.4.1",
     "terser": "^5.12.1",
     "tslib": "^2.3.1",
