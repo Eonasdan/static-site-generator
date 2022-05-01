@@ -19,18 +19,18 @@ export default class Images {
             let responsiveImage = imageResult[i];
             let pictureTag = '<picture>\n';
             responsiveImage.sizedImages
-                .sort((a, b) => a.width < b.width ? 1 : -1);
+                .sort((a, b) => a.size.width < b.size.width ? 1 : -1);
 
+            const firstImage = responsiveImage.sizedImages[0];
             for (let j = 0; j < responsiveImage.sizedImages.length; j++) {
                 const current = responsiveImage.sizedImages[j];
+                pictureTag += `<source media="(min-width: ${current.size.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
                 if (j + 1 >= responsiveImage.sizedImages.length) {
-                    pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
-                    pictureTag += `<img src="${config.sourceSetPath}/${responsiveImage.sizedImages[0].file}" alt="${alt[i]}"/>\n`;
+                    pictureTag += `<img src="${config.sourceSetPath}/${firstImage.file}" alt="${alt[i]}" height="${firstImage.size.height}" width="${firstImage.size.width}"/>\n`;
                     break;
                 }
-                pictureTag += `<source media="(min-width: ${current.width}px)" srcset="${config.sourceSetPath}/${current.file}"/>\n`;
             }
-            
+
             pictureTag += '</picture>';
 
             pictureTags.push({
@@ -52,7 +52,7 @@ export default class Images {
         }
 
         for (const file of config.images) {
-            const sizedImages: { file: string, width: number }[] = [];
+            const sizedImages: { file: string, size: Size }[] = [];
             for (let size of config.sizes) {
                 sizedImages.push(await this.generateResponsiveImageAsync(file, size, config.destinationDirectory, config.sharpConfig));
             }
@@ -65,7 +65,7 @@ export default class Images {
         return files;
     }
 
-    async generateResponsiveImageAsync(file: string, size: Size, destinationDirectory: string, sharpConfig: SharpConfig): Promise<{ file: string, width: number }> {
+    async generateResponsiveImageAsync(file: string, size: Size, destinationDirectory: string, sharpConfig: SharpConfig): Promise<{ file: string, size: Size }> {
         const msgPrefix = `File ${file}: `
         const image = sharp(file);
 
@@ -195,11 +195,7 @@ export default class Images {
 
         const oldFileName = path.basename(file, path.extname(file));
         const newFileName = `${oldFileName}-${width}w.${toFormat}`;
-        
-        /*var a = file.replace(/\\/g, '')
-            .replace('site-sourcecopyimg', '')
-            .replace(oldFileName, '').replace(path.extname(file), '');
-        const newPath = path.join(destinationDirectory, a, newFileName);*/
+
         const newPath = path.join(destinationDirectory, newFileName);
         await fs.mkdir(path.dirname(newPath), {recursive: true});
 
@@ -207,7 +203,10 @@ export default class Images {
 
         return {
             file: newFileName,
-            width: width
+            size: {
+                width: width,
+                height: height
+            }
         };
     }
 
@@ -359,7 +358,7 @@ export type ResponsiveImages = {
     file: string,
     sizedImages: {
         file: string;
-        width: number;
+        size: Size;
     }[]
 }
 

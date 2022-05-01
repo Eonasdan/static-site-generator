@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('editor', JSON.stringify(outputData));
 
         const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
-        const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'));
+        const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'), { autohide: false});
         savingToast.show();
 
         try {
@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 savingToast.hide();
                 const toast = new bootstrap.Toast(document.getElementById('successMessage'));
                 toast.show();
+                clear();
                 setTimeout(() => {
                     window.location.href = response.post;
                 }, 1.5 * 1000);
@@ -173,15 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('clearButton').addEventListener('click', () => {
         areYouSureModal.show();
 
-        const clear = () => {
-            editor.clear();
-            form.reset();
-            postDate.value = dateForInput();
-            metaBlur({target: {name: 'postDate', value: postDate.value}});
-            areYouSureModalConfirm.removeEventListener('click', clear);
-            areYouSureModal.hide();
-        }
-
         const cancel = () => {
             areYouSureModalClose.removeEventListener('click', cancel);
         }
@@ -189,6 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
         areYouSureModalConfirm.addEventListener('click', clear);
         areYouSureModalClose.addEventListener('click', cancel);
     });
+
+    const clear = () => {
+        editor.clear();
+        form.reset();
+        postDate.value = dateForInput();
+        metaBlur({target: {name: 'postDate', value: postDate.value}});
+        areYouSureModalConfirm.removeEventListener('click', clear);
+        areYouSureModal.hide();
+    }
 
     const formatter = new Intl.DateTimeFormat(undefined, {
         year: "numeric",
