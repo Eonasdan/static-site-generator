@@ -18,7 +18,8 @@ export default [
             copy({
                 targets: {
                     src: './server/mime-types.json', dest: './ts-out/mime-types.json'
-                }
+                },
+                overwrite: true
             })
         ],
         external: [

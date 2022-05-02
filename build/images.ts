@@ -199,13 +199,13 @@ export default class Images {
         const newPath = path.join(destinationDirectory, newFileName);
         await fs.mkdir(path.dirname(newPath), {recursive: true});
 
-        await image.toFile(newPath)
+        const info = await image.toFile(newPath);
 
         return {
             file: newFileName,
             size: {
-                width: width,
-                height: height
+                width: info.width,
+                height: info.height
             }
         };
     }

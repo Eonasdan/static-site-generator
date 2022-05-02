@@ -127,8 +127,8 @@ export default class PicoServer {
             }
 
             let file = await fs.readFile(filePath);
-            let mimeType = this.mimeTypes.find(x => x.extensions
-                .includes(path.extname(url).replace('.', '')))?.type;
+            const extension = path.extname(url).replace('.', '');
+            let mimeType = this.mimeTypes.find(x => x.extensions.includes(extension))?.type;
             if (!mimeType) {
                 mimeType = 'text/html';
                 console.warn(`Couldn't determine mimetype for ${path.extname(url)}. Defaulting to html`)

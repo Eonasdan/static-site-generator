@@ -68,13 +68,17 @@
 
 .form-control {
     background-color: transparent;
-    color: var(--gray);
+    color: var(--white);
 }
 
 .form-control:focus {
     background-color: transparent;
-    color: var(--gray);
+    color: var(--white);
     border-color: #86b7fe;
+}
+
+.form-text {
+    color: var(--white);
 }
 
 /** editor **/

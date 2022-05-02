@@ -1,10 +1,34 @@
 /* global Header, Checklist, List, ImageTool, CodeTool, InlineCode */
+
+class Editor {
+    excerpt = document.getElementById('excerpt');
+    excerptLow = document.getElementById('excerptLow');
+    excerptHigh = document.getElementById('excerptHigh');
+
+    ready() {
+        this.excerpt.addEventListener('keydown', this.updateExcerpt.bind(this));
+    }
+
+    updateExcerpt() {
+        const excerptLength = this.excerpt.value.length;
+        const colors = ['text-danger', 'text-success'];
+        this.excerptLow.classList.remove(...colors);
+        this.excerptHigh.classList.remove(...colors);
+        if (excerptLength < 50) this.excerptLow.classList.add(colors[0]);
+        else this.excerptLow.classList.add(colors[1]);
+
+        if (excerptLength > 160) this.excerptHigh.classList.add(colors[0]);
+        else this.excerptHigh.classList.add(colors[1]);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    new Editor().ready();
 
     const previewButton = document.getElementById('previewButton');
     const editorDiv = document.getElementById('editorContainer');
     const outputDiv = document.getElementById('output');
-    const saveModalButton = document.getElementById('saveModalButton');
     const tagUl = document.getElementById('tagsContainer');
     const form = document.getElementById('postMetaForm');
     const postDate = document.getElementById('postDate');
@@ -136,7 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('save').addEventListener('click', async () => {
-        if (!form.checkValidity()) return;
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
         const outputData = await editor.save();
         if (!outputData) return;
         form.classList.add('was-validated');
@@ -144,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('editor', JSON.stringify(outputData));
 
         const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
-        const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'), { autohide: false});
+        const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'), {autohide: false});
         savingToast.show();
 
         try {
@@ -164,8 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 savingToast.hide();
                 errorToast.show();
             }
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e);
             errorToast.show();
         }
@@ -231,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             /*case 'postAuthorUrl':
                 outputDiv.getElementsByClassName('')[0].innerText = input.value;
                 break;*/
+                //todo excerpt trigger
         }
         localStorage.setItem('draft-meta', JSON.stringify(
             [...form.querySelectorAll('input, textarea')].filter(x => x.id !== 'thumbnail').reduce((object, element) => {

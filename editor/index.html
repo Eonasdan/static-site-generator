@@ -71,45 +71,50 @@
                         <div id="postMeta" class="accordion-body">
                             <form id="postMetaForm" action="" method="post">
                                 <div class="mb-3">
-                                    <label for="title" class="form-label">Post Title</label>
+                                    <label for="title" class="form-label">Post Title <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" name="title" required/>
                                     <div class="invalid-feedback">
                                         Required
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="thumbnail" class="form-label">Thumbnail</label>
+                                    <label for="thumbnail" class="form-label">Thumbnail <span class="text-danger">*</span></label>
                                     <input class="form-control" type="file" id="thumbnail" name="thumbnail"
-                                           accept="image/*"/>
+                                           accept="image/*" required/>
                                 </div>
                                 <div class="mb-3">
                                     <label for="thumbnailAlt" class="form-label">Thumbnail Alt Text</label>
-                                    <input class="form-control" type="text" id="thumbnailAlt" name="thumbnailAlt"/>
+                                    <input class="form-control" type="text" id="thumbnailAlt" name="thumbnailAlt" aria-describedby="thumbnailAltHelp">
+                                    <div id="thumbnailAltHelp" class="form-text">This will also be used to name image.</div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="postDate" class="form-label">Post Date</label>
+                                    <label for="postDate" class="form-label">Post Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="postDate" name="postDate" required/>
                                     <div class="invalid-feedback">
                                         Required
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="excerpt" class="form-label">Excerpt</label>
+                                    <label for="excerpt" class="form-label">Excerpt <span class="text-danger">*</span></label>
                                     <textarea type="text" class="form-control" id="excerpt" name="excerpt"
                                               required></textarea>
                                     <div class="invalid-feedback">
                                         Required
                                     </div>
+                                    <div id="excerptHelp" class="form-text">
+                                        A recommend descriptions between <span id="excerptLow">50</span>–<span id="excerptHigh">160</span> character.
+                                        Google generally truncates snippets to ~155–160 characters
+                                    </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="tags" class="form-label">Tags (separate by comma)</label>
+                                    <label for="tags" class="form-label">Tags (separate by comma) <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="tags" name="tags" required/>
                                     <div class="invalid-feedback">
                                         Required
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="postAuthorName" class="form-label">Post Author Name</label>
+                                    <label for="postAuthorName" class="form-label">Post Author Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="postAuthorName" name="postAuthorName"
                                            required/>
                                     <div class="invalid-feedback">
