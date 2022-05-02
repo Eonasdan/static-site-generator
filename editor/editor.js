@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    //todo replace with formatter
     const dateForInput = () => {
         return new Date().toISOString().slice(0, -14)
     }
@@ -102,9 +103,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const thumbnailHelp = document.getElementById('thumbnailHelp');
+    const img = new Image();
     const fileReader = new FileReader();
     fileReader.addEventListener("load", (e) => {
         document.querySelector('#post-thumbnail img').src = e.target.result;
+
+        img.onload = () => {
+            thumbnailHelp.classList.remove('show', 'hide');
+            if (img.width < 1200)
+                thumbnailHelp.classList.add('show');
+            thumbnailHelp.classList.add('hide');
+        };
+
+        img.src = e.target.result; // is the data URL because called with readAsDataURL
+
     }, false);
 
     function onSave() {
