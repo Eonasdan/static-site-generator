@@ -1,4 +1,4 @@
-/* global Header, Checklist, List, ImageTool, CodeTool, InlineCode */
+/* global Header, Checklist, List, ImageTool, CodeTool, InlineCode, Prism */
 
 class Editor {
     excerpt = document.getElementById('excerpt');
@@ -23,6 +23,8 @@ class Editor {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/';
 
     new Editor().ready();
 
@@ -80,29 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         data: draftEditor
     });
 
-    const parser = new edjsParser(undefined, {
-        code: (data) => {
-            if (!data) return '';
-            const sanitizeHtml = function (markup) {
-                markup = markup.replace(/&/g, "&amp;");
-                markup = markup.replace(/</g, "&lt;");
-                markup = markup.replace(/>/g, "&gt;");
-                return markup;
-            }
-            let codeClass = '';
-            switch (data.languageCode) {
-                case 'js':
-                    codeClass = 'language-javascript'
-                    break;
-                case 'typescript':
-                    codeClass = 'language-typescript'
-                    break;
-            }
-
-            return `<pre><code class="${codeClass}">${sanitizeHtml(data.code)}</code></pre>`
-        }
-    });
-
     const thumbnailHelp = document.getElementById('thumbnailHelp');
     const img = new Image();
     const fileReader = new FileReader();
@@ -149,20 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /*document.getElementById('saveModalButton').addEventListener('click', () => {
-        editor.save().then(data => {
-            if (!data) {
-                return;
-            }
-            const saveModal = new bootstrap.Modal(document.getElementById('saveModal'));
-            saveModal.show()
-        });
-    });*/
-
     previewButton.addEventListener('click', () => {
         if (previewButton.innerText === 'Preview') {
             editor.save().then(data => {
-                document.getElementById('previewContent').innerHTML = parser.parse(data);
+                document.getElementById('previewContent').innerHTML = eonasdan.parser(data.blocks);
                 Prism.highlightAll();
             });
         }

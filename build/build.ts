@@ -13,7 +13,7 @@ import Images, {defaultSizes} from "./images";
 import {EditorModel} from "./models/editor-model";
 
 const dropCss = require('dropcss');
-const edjsParser = require("editorjs-parser");
+const edjsParser = require("eonadan-editorjs-parser");
 const {readFileSync, cp} = require('fs')
 const cpPromise = promisify(cp);
 const CleanCSS = require('clean-css');
@@ -159,9 +159,6 @@ export default class Build {
     async prepareCssAsync() {
         this.cssWhitelist = new Set();
 
-        this.cssWhitelist.add('post-tags');
-        this.cssWhitelist.add('mt-30');
-
         const compileResult = await sass.compileAsync(`./${this.siteConfig.source}/styles/style.scss`, {sourceMap: true});
         this.sourceMap = compileResult.sourceMap.mappings;
         this.css = compileResult.css;
@@ -202,9 +199,7 @@ export default class Build {
 
             postMeta.parse(postDocument.getElementById('post-meta'));
 
-            const postTagsDiv = postDocument.createElement('div');
-            postTagsDiv.classList.add('post-tags', 'mt-30');
-            const postTagsUl = postDocument.createElement('ul');
+            const postTagsUl = newPageDocument.querySelector('.post-tags > ul');
 
             postMeta.tags?.split(',').map(tag => tag.trim()).forEach(tag => {
                 const li = postDocument.createElement('li');
@@ -215,8 +210,8 @@ export default class Build {
                 postTagsUl.appendChild(li);
             });
 
-            postTagsDiv.appendChild(postTagsUl);
-            article.appendChild(postTagsDiv);
+            //hack for #22
+            postTagsUl.removeChild(postTagsUl.querySelector('#tag-delete'))
 
             const loopDocument = new JSDOM(this.postLoopTemplate).window.document;
             newPageDocument.getElementById('post-inner').innerHTML = article.innerHTML;
@@ -460,32 +455,6 @@ ${this.siteMap}
         element.innerHTML = value;
     }
 
-    parser = new edjsParser(undefined, {
-        code: (data) => {
-            if (!data) return '';
-            const sanitizeHtml = function (markup) {
-                markup = markup.replace(/&/g, '&amp;');
-                markup = markup.replace(/</g, '&lt;');
-                markup = markup.replace(/>/g, '&gt;');
-                return markup;
-            }
-            let codeClass = '';
-            switch (data.languageCode) {
-                case 'js':
-                    codeClass = 'language-javascript'
-                    break;
-                case 'typescript':
-                    codeClass = 'language-typescript'
-                    break;
-            }
-
-            return `<pre><code class="${codeClass}">${sanitizeHtml(data.code)}</code></pre>`
-        },
-        image: (data) => {
-            return data.pictureSet;
-        }
-    });
-
     async fileExists(file): Promise<boolean> {
         try {
             return !!await fs.stat(file);
@@ -532,7 +501,7 @@ ${this.siteMap}
                 }
             }
 
-            const body = this.parser.parse(rawEditor);
+            const body = edjsParser.parser(rawEditor.blocks);
 
             const newThumbnailPath = `${postImagePath}/${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
             await fs.rename(thumbnail, newThumbnailPath);

@@ -75,7 +75,6 @@ export class Watcher {
 
             return;
         } catch (e) {
-            debugger;
             console.log('Failed to upload file', e);
             res.writeHead(500);
             res.end(JSON.stringify({
