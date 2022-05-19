@@ -4,15 +4,16 @@ import * as path from 'path';
 
 const chokidar = require('chokidar');
 
-import PicoServer from '../server/pico-server';
+import { ParvusServer } from '@eonasdan/parvus-server';
 import Build from './build';
-import PostMeta from './models/PostMeta';
-import PostAuthor from './models/PostAuthor';
+import PostMeta from './models/post-meta';
+import PostAuthor from './models/post-author';
 import Utilities from './utilities';
 import {EditorModel} from "./models/editor-model";
+import {FileHelpers} from "./file-helpers";
 
 export class Watcher {
-    private pico: PicoServer;
+    private parvusServer: ParvusServer;
     private builder: Build;
 
     constructor(builder: Build) {
@@ -22,10 +23,10 @@ export class Watcher {
 
     async startAsync() {
         await this.builder.updateAllAsync();
-        this.pico = new PicoServer({
+        this.parvusServer = new ParvusServer({
             port: this.builder.siteConfig.server.port,
-            directory: `../${this.builder.siteConfig.server.serveFrom}`,
-            sub: this.builder.siteConfig.site.subfolder,
+            directory: `./${this.builder.siteConfig.server.serveFrom}`,
+            subfolder: this.builder.siteConfig.site.subfolder,
             middlewares: [
                 {
                     middleware: this.uploadMiddlewareAsync.bind(this),
@@ -36,28 +37,28 @@ export class Watcher {
                     route: '/editor/save'
                 },
                 {
-                    middleware: this.loadEditorAsync.bind(this),
+                    middleware: this.useDefaultHandlerAsync.bind(this),
                     route: '/editor/*'
                 },
                 {
-                    middleware: this.loadTemporaryImagesAsync.bind(this),
+                    middleware: this.useDefaultHandlerAsync.bind(this),
                     route: '/img_temp/*'
                 }
             ]
         });
-        await this.pico.startAsync();
+        await this.parvusServer.startAsync();
         this.startFileWatcher();
     }
 
     refreshBrowser() {
-        this.pico.refreshBrowser();
+        this.parvusServer.refreshBrowser();
     }
 
     async uploadMiddlewareAsync(req: IncomingMessage, res: ServerResponse) {
         res.writeHead(200, {'Content-Type': 'application/json'});
         try {
             const form = formidable({multiples: true, keepExtensions: true, uploadDir: './img_temp'});
-            form.parse(req, (err, fields, files) => {
+            form.parse(req, (err, _, files) => {
                 if (err) {
                     res.writeHead(err.httpCode || 400, {'Content-Type': 'text/plain'});
                     res.end(String(err));
@@ -115,12 +116,8 @@ export class Watcher {
         res.end(JSON.stringify(result));
     }
 
-    async loadEditorAsync(req: IncomingMessage, res: ServerResponse) {
-        await this.pico.defaultHandler(req, res, '../', false);
-    }
-
-    async loadTemporaryImagesAsync(req: IncomingMessage, res: ServerResponse) {
-        await this.pico.defaultHandler(req, res, '../', false);
+    async useDefaultHandlerAsync(req: IncomingMessage, res: ServerResponse) {
+        await this.parvusServer.defaultHandler(req, res, '../', false);
     }
 
     private startFileWatcher() {
@@ -160,10 +157,10 @@ export class Watcher {
                 const destination = change.replace(copy, main)
                 switch (event) {
                     case 'add':
-                        await this.builder.copyFileAsync(change, destination);
+                        await FileHelpers.copyFileAsync(change, destination);
                         break;
                     case 'unlink':
-                        await this.builder.removeFileAsync(destination);
+                        await FileHelpers.removeFileAsync(destination);
                         break;
                 }
             }
@@ -180,7 +177,7 @@ export class Watcher {
     private cleanTimer(callback: () => void, delay = 1000) {
         let timer = setTimeout(() => {
             callback();
-            timer = null;
+            window.clearTimeout(timer);
         }, delay);
     }
 }

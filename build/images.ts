@@ -14,8 +14,8 @@ export default class Images {
     async generateSourceSetAsync(config: ImageGenerateConfig, alt: string[] = []): Promise<PictureSet[]> {
         const pictureTags: PictureSet[] = [];
         const imageResult = await this.generateResponsiveImagesAsync(config);
-        
-        for (let i = 0; i < imageResult.length; i++){
+
+        for (let i = 0; i < imageResult.length; i++) {
             let responsiveImage = imageResult[i];
             let pictureTag = '<picture>\n';
             responsiveImage.sizedImages
@@ -66,49 +66,22 @@ export default class Images {
     }
 
     async generateResponsiveImageAsync(file: string, size: Size, destinationDirectory: string, sharpConfig: SharpConfig): Promise<{ file: string, size: Size }> {
-        const msgPrefix = `File ${file}: `
+        const messagePrefix = `File ${file}: `
         const image = sharp(file);
 
         const metadata = await image.metadata();
 
-        let width, height, extract, toFormat = sharpConfig.format;
-
-        if (!sharpConfig.format) {
-            toFormat = Images.format(file)
-        }
+        let width: number,
+            height: number,
+            extract: { top: any; left: any; width: any; height: any; },
+            toFormat = sharpConfig.format || Images.format(file);
 
         width = Images.size(size.width, metadata.width);
         height = Images.size(size.height, metadata.height);
 
-        if (width || height) {
-            if (sharpConfig.resizeOptions.withoutEnlargement && (width > metadata.width || height > metadata.height)) {
-                let message = `${msgPrefix} Image enlargement is detected`
+        const validateWidthHeight = Images.validateWidthHeight(width, height, sharpConfig, metadata, messagePrefix);
 
-                if (width) {
-                    message += `\n  real width: ${metadata.width}px, required width: ${width}px`
-                }
-
-                if (height) {
-                    message += `\n  real height: ${metadata.height}px, required height: ${height}px`
-                }
-
-                if (sharpConfig.errorOnEnlargement) {
-                    throw Error(message)
-                }
-                if (sharpConfig.skipOnEnlargement) {
-                    if (!sharpConfig.silent) {
-                        Utilities.log(`(skip for processing)`, msgPrefix)
-                    }
-
-                    // passing a null file to the callback stops a new image being added to the pipeline for this sharpConfig
-                    return null;
-                }
-
-                if (!sharpConfig.silent) {
-                    Utilities.log(`(skip for enlargement)`, msgPrefix)
-                }
-            }
-        }
+        if (!validateWidthHeight) return;
 
         try {
             if (sharpConfig.extractBeforeResize) {
@@ -138,7 +111,7 @@ export default class Images {
                     background: sharpConfig.resizeOptions.background
                 });
             }
-            
+
             if (sharpConfig.negate) {
                 image.negate(sharpConfig.negate);
             }
@@ -150,11 +123,11 @@ export default class Images {
             if (sharpConfig.flip) {
                 image.flip(sharpConfig.flip);
             }
-            
+
             if (sharpConfig.flop) {
                 image.flop(sharpConfig.flop);
             }
-            
+
             if (sharpConfig.blur) {
                 image.blur(sharpConfig.blur);
             }
@@ -174,15 +147,15 @@ export default class Images {
             if (sharpConfig.grayscale) {
                 image.grayscale(sharpConfig.grayscale);
             }
-            
+
             if (sharpConfig.normalize) {
                 image.normalize(sharpConfig.normalize);
             }
-            
+
             if (sharpConfig.withMetadata) {
                 image.withMetadata(sharpConfig.withMetadata);
             }
-            
+
             if (sharpConfig.tile) {
                 image.tile(sharpConfig.tile);
             }
@@ -292,6 +265,38 @@ export default class Images {
         };
 
         return Object.assign({}, defaultConfig, config);
+    }
+
+    private static validateWidthHeight(width: number, height: number, sharpConfig: SharpConfig, metadata: sharp.Metadata, messagePrefix: string) {
+        if (!(width || height)) {
+            return false;
+        }
+        if (!(sharpConfig.resizeOptions.withoutEnlargement && (width > metadata.width || height > metadata.height))) {
+            return false;
+        }
+        let message = `${messagePrefix} Image enlargement is detected`
+        if (width) {
+            message += `\n  real width: ${metadata.width}px, required width: ${width}px`
+        }
+        if (height) {
+            message += `\n  real height: ${metadata.height}px, required height: ${height}px`
+        }
+        if (sharpConfig.errorOnEnlargement) {
+            throw Error(message)
+        }
+        if (sharpConfig.skipOnEnlargement) {
+            if (!sharpConfig.silent) {
+                Utilities.log(`(skip for processing)`, messagePrefix)
+            }
+
+            // passing a null file to the callback stops a new image being added to the pipeline for this sharpConfig
+            return false;
+        }
+        if (!sharpConfig.silent) {
+            Utilities.log(`(skip for enlargement)`, messagePrefix)
+        }
+
+        return true;
     }
 }
 

@@ -1,4 +1,4 @@
-import PostAuthor from './PostAuthor';
+import PostAuthor from './post-author';
 
 export default class PostMeta {
     file: string;
@@ -6,19 +6,21 @@ export default class PostMeta {
     body: string;
     postDate: Date;
     updateDate: Date;
-    thumbnail: HTMLElement;
+    mastImage: HTMLElement;
     excerpt: string;
     tags = '';
     author: PostAuthor;
+    thumbnail: string;
+    url: string;
 
     constructor(file = '', title = '', body = '', postDate = undefined, updateDate = undefined,
-                thumbnail = undefined, excerpt = '', tags = '', author = new PostAuthor()) {
+                mastImage = undefined, excerpt = '', tags = '', author = new PostAuthor()) {
         this.file = file;
         this.title = title;
         this.body = body;
         this.postDate = postDate;
         this.updateDate = updateDate;
-        this.thumbnail = thumbnail;
+        this.mastImage = mastImage;
         this.excerpt = excerpt;
         this.tags = tags;
         this.author = author;
@@ -29,8 +31,11 @@ export default class PostMeta {
         const title = metaTag.querySelector('#title')?.innerHTML;
         if (title) this.title = title.trim();
 
-        const thumbnail = metaTag.querySelector('#thumbnail');
-        if (thumbnail.childNodes.length !== 0) this.thumbnail = <HTMLElement>thumbnail;
+        const mastImage = metaTag.querySelector('#thumbnail');
+        if (mastImage.childNodes.length !== 0) {
+            this.mastImage = <HTMLElement>mastImage;
+            this.thumbnail = this.mastImage.getElementsByTagName('source')[3].srcset;
+        }
 
         const postDate = metaTag.querySelector('#post-date')?.innerHTML;
         if (postDate) this.postDate = new Date(postDate.trim());

@@ -42,7 +42,8 @@ export default [
             'terser',
             'sass',
             'html-minifier-terser',
-            'sharp'
+            'sharp',
+            '@eonasdan/parvus-server'
         ]
     }
 ];

@@ -1,21 +1,18 @@
-import PostMeta from './models/PostMeta';
+import PostMeta from './models/post-meta';
 import Utilities from './utilities';
 import {SiteConfig} from './models/site-config';
 
 import {promises as fs} from 'fs';
-import {promisify} from 'util';
 import {JSDOM} from 'jsdom';
 import * as path from 'path';
 import {minify as minifyHtml} from 'html-minifier-terser';
 import {minify} from 'terser';
 import * as sass from 'sass';
 import Images, {defaultSizes} from "./images";
-import {EditorModel} from "./models/editor-model";
-
+import {FileHelpers} from "./file-helpers";
+const {readFileSync } = require('fs')
 const dropCss = require('dropcss');
-const edjsParser = require("eonadan-editorjs-parser");
-const {readFileSync, cp} = require('fs')
-const cpPromise = promisify(cp);
+const editorJsParser = require("@eonasdan/editorjs-parser");
 const CleanCSS = require('clean-css');
 
 export default class Build {
@@ -45,6 +42,7 @@ export default class Build {
 
     constructor() {
         this.siteConfig = JSON.parse(readFileSync(`./build/site-config.json`, 'utf8'));
+        FileHelpers.siteConfig = this.siteConfig;
         this.subFolder = this.siteConfig.site.subfolder ? `${this.siteConfig.site.subfolder}/` : '';
         this.baseUrl = `${this.siteConfig.site.root}/${this.subFolder}`;
     }
@@ -54,8 +52,8 @@ export default class Build {
         this.postTemplate = await this.postDocumentAsync();
         this.postLoopTemplate = await this.loadTemplateAsync(`post-loop`);
         this.reset();
-        await this.removeDirectoryAsync(`./${this.siteConfig.output.main}`, false);
-        await this.copyFileAsync();
+        await FileHelpers.removeDirectoryAsync(`./${this.siteConfig.output.main}`, false);
+        await FileHelpers.copyFileAsync();
         await this.update404Async();
         await this.prepareCssAsync();
         await this.updatePostsAsync();
@@ -80,46 +78,6 @@ export default class Build {
             .replace(/\s+/g, ' ').trim() //replace extra white space
             .split(' ');// split at words;
         return Array.from(new Set(bodyPrep)).join(' '); //remove duplicate words
-    }
-
-    async removeDirectoryAsync(directory, removeSelf = true) {
-        try {
-            const files = await fs.readdir(directory) || [];
-            for (const file of files) {
-                const filePath = path.join(directory, file);
-                if ((await fs.stat(filePath)).isFile())
-                    await this.removeFileAsync(filePath);
-                else
-                    await this.removeDirectoryAsync(filePath);
-            }
-        } catch (e) {
-            return;
-        }
-        if (removeSelf)
-            await fs.rmdir(directory);
-    }
-
-    async removeFileAsync(filePath) {
-        if (!(await fs.stat(filePath)).isFile()) return;
-        try {
-            await fs.unlink(filePath);
-        } catch (e) {
-        }
-    }
-
-    async copyFileAsync(filePath?: string, destination?: string) {
-        //copy all
-        if (!filePath) {
-            await cpPromise(`./${this.siteConfig.source}/copy`, this.siteConfig.output.main, {recursive: true});
-            return;
-        }
-        await fs.copyFile(filePath, destination);
-    }
-
-    async writeFileAndEnsurePathExistsAsync(filePath, content) {
-        await fs.mkdir(path.dirname(filePath), {recursive: true});
-
-        await fs.writeFile(filePath, content);
     }
 
     // since everyone has to have their own metadata *rolls eyes* the primary purpose here
@@ -176,7 +134,7 @@ export default class Build {
         this.reset();
         const postOutput = `./${this.siteConfig.output.main}/${this.siteConfig.output.posts}`;
         //remove old stuff
-        await this.removeDirectoryAsync(postOutput, false);
+        await FileHelpers.removeDirectoryAsync(postOutput, false);
 
         const posts = (await fs
             .readdir(`./${this.siteConfig.source}/partials`))
@@ -230,12 +188,12 @@ export default class Build {
             };
 
             newPageDocument.title = postMeta.title;
-            if (postMeta.thumbnail) {
-                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.thumbnail.innerHTML);
+            if (postMeta.mastImage) {
+                this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.mastImage.innerHTML);
                 this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
-                    `<img src="${postMeta.thumbnail.getElementsByTagName('source')[3].srcset}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);
+                    `<img src="${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);
 
-                const fullyQualifiedImage = `${this.baseUrl}${postMeta.thumbnail.getElementsByTagName('source')[0].srcset}`;
+                const fullyQualifiedImage = `${this.baseUrl}${postMeta.mastImage.getElementsByTagName('source')[0].srcset}`;
                 this.setMetaContent(newPageDocument, 'metaImage', fullyQualifiedImage);
                 this.setStructuredData(structuredData, 'image', [
                     fullyQualifiedImage
@@ -249,7 +207,8 @@ export default class Build {
             this.setMetaContent(newPageDocument, 'metaTitle', postMeta.title);
             this.setStructuredData(structuredData, 'headline', postMeta.title);
             this.setInnerHtml(loopDocument.getElementsByClassName('post-title')[0], postMeta.title);
-            (loopDocument.getElementsByClassName('post-link')[0] as HTMLLinkElement).href = `/${this.subFolder}${this.siteConfig.output.posts}/${postMeta.file}`
+            postMeta.url = `/${this.subFolder}${this.siteConfig.output.posts}/${postMeta.file}`;
+            (loopDocument.getElementsByClassName('post-link')[0] as HTMLLinkElement).href = postMeta.url;
 
             this.setMetaContent(newPageDocument, 'metaDescription', postMeta.excerpt);
             this.setMetaContent(newPageDocument, 'metaUrl', fullyQualifiedUrl);
@@ -279,7 +238,7 @@ export default class Build {
             newPageDocument.getElementsByTagName('body')[0].appendChild(structuredDataTag);
 
             const completeHtml = await this.createRootHtmlAsync(newPageDocument.documentElement.innerHTML);
-            await this.writeFileAndEnsurePathExistsAsync(`./${postOutput}/${file}`, completeHtml);
+            await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${postOutput}/${file}`, completeHtml);
 
             //update pure css
             dropCss({
@@ -306,7 +265,7 @@ export default class Build {
                 return +new Date(a.postDate) > +new Date(b.postDate) ? -1 : 0;
             });
 
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(this.postsMeta, null, 2));
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(this.postsMeta, null, 2));
 
         await this.updateSiteMapAsync();
         await this.updateHomepageAsync();
@@ -337,7 +296,7 @@ export default class Build {
         }
 
         const completeHtml = await this.createRootHtmlAsync(shell.documentElement.innerHTML);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/index.html`, completeHtml);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/index.html`, completeHtml);
         dropCss({
             css: this.css,
             html: completeHtml
@@ -350,7 +309,7 @@ export default class Build {
         shell.getElementById('mainContent').innerHTML = indexDocument.documentElement.innerHTML;
 
         const completeHtml = await this.createRootHtmlAsync(shell.documentElement.innerHTML);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/404.html`, await this.createRootHtmlAsync(shell.documentElement.innerHTML));
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/404.html`, await this.createRootHtmlAsync(shell.documentElement.innerHTML));
         dropCss({
             css: this.css,
             html: completeHtml
@@ -366,7 +325,7 @@ export default class Build {
 </url>
 ${this.siteMap}
 </urlset>`;
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/sitemap.xml`, this.siteMap);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/sitemap.xml`, this.siteMap);
     }
 
     async updateCssAsync() {
@@ -402,6 +361,7 @@ ${this.siteMap}
     async cleanCssAsync() {
         const sourceMapComment = "/*# sourceMappingURL=style.css.map */"
 
+        // noinspection JSUnusedGlobalSymbols
         let optimized = dropCss({
             html: '',
             css: this.css,
@@ -413,9 +373,9 @@ ${this.siteMap}
         let cleanedCss = new CleanCSS().minify(optimized).styles;
         cleanedCss += sourceMapComment;
 
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css`, optimized);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, cleanedCss);
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css.map`, this.sourceMap);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css`, optimized);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.min.css`, cleanedCss);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/css/style.css.map`, this.sourceMap);
     }
 
     async minifyJsAsync() {
@@ -438,7 +398,7 @@ ${this.siteMap}
 
         const uglified = await minify(js);
 
-        await this.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/bundle.min.js`, uglified.code);
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/bundle.min.js`, uglified.code);
     }
 
     async getPictureSet(image: string, destination: string, folder: string, alt: string) {
@@ -501,7 +461,7 @@ ${this.siteMap}
                 }
             }
 
-            const body = edjsParser.parser(rawEditor.blocks);
+            const body = editorJsParser.parser(rawEditor.blocks);
 
             const newThumbnailPath = `${postImagePath}/${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
             await fs.rename(thumbnail, newThumbnailPath);
@@ -519,9 +479,9 @@ ${this.siteMap}
                 .replace(/==excerpt==/g, postMeta.excerpt)
                 .replace(/==author-url==/g, postMeta.author.url);
 
-            await this.writeFileAndEnsurePathExistsAsync(partialPath, newPost);
+            await FileHelpers.writeFileAndEnsurePathExistsAsync(partialPath, newPost);
 
-            await this.removeDirectoryAsync('./img_temp', false);
+            await FileHelpers.removeDirectoryAsync('./img_temp', false);
             await this.updateAllAsync();
             this.saveInProgress = false;
             return {
@@ -532,8 +492,8 @@ ${this.siteMap}
         } catch (e) {
             this.saveInProgress = false;
             console.error(e);
-            await this.removeDirectoryAsync(postImagePath, true);
-            await this.removeFileAsync(partialPath);
+            await FileHelpers.removeDirectoryAsync(postImagePath, true);
+            await FileHelpers.removeFileAsync(partialPath);
             return {
                 success: false,
                 error: e
