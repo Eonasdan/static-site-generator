@@ -1,6 +1,8 @@
 import PostMeta from './models/post-meta';
 import Utilities from './utilities';
 import {SiteConfig} from './models/site-config';
+import Images, {defaultSizes} from "./images";
+import {FileHelpers} from "./file-helpers";
 
 import {promises as fs} from 'fs';
 import {JSDOM} from 'jsdom';
@@ -8,8 +10,6 @@ import * as path from 'path';
 import {minify as minifyHtml} from 'html-minifier-terser';
 import {minify} from 'terser';
 import * as sass from 'sass';
-import Images, {defaultSizes} from "./images";
-import {FileHelpers} from "./file-helpers";
 const {readFileSync } = require('fs')
 const dropCss = require('dropcss');
 const editorJsParser = require("@eonasdan/editorjs-parser");
@@ -415,21 +415,12 @@ ${this.siteMap}
         element.innerHTML = value;
     }
 
-    async fileExists(file): Promise<boolean> {
-        try {
-            return !!await fs.stat(file);
-        } catch (err) {
-            return false;
-        }
-
-    }
-
     async saveAsync(postMeta: PostMeta, thumbnail: string, thumbnailAlt: string, rawEditor) {
         const postImagePath = `./${this.siteConfig.source}/copy/img/${postMeta.file}`;
         const partialPath = `./${this.siteConfig.source}/partials/${postMeta.file}.html`;
 
         try {
-            let exists = await this.fileExists(partialPath);
+            let exists = await FileHelpers.fileExists(partialPath);
             if (exists) {
                 return {
                     success: false,

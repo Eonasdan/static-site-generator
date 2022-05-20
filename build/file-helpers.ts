@@ -48,4 +48,12 @@ export class FileHelpers {
 
         await fs.writeFile(filePath, content);
     }
+
+    static async fileExists(file): Promise<boolean> {
+        try {
+            return !!await fs.stat(file);
+        } catch (err) {
+            return false;
+        }
+    }
 }
