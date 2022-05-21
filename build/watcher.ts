@@ -117,7 +117,7 @@ export class Watcher {
     }
 
     async useDefaultHandlerAsync(req: IncomingMessage, res: ServerResponse) {
-        await this.parvusServer.defaultHandler(req, res, '../', false);
+        await this.parvusServer.defaultHandler(req, res, './', false);
     }
 
     private startFileWatcher() {
