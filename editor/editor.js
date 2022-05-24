@@ -92,7 +92,7 @@ class Editor {
         });
 
         document.getElementById('postMeta').querySelectorAll('input, textarea').forEach(e => {
-            e.addEventListener('blur', this.metaBlur)
+            e.addEventListener('blur', this.metaBlur.bind(this));
         });
 
         document.getElementById('save').addEventListener('click', this.savePost.bind(this));

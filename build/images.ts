@@ -271,19 +271,25 @@ export default class Images {
         if (!(width || height)) {
             return false;
         }
+
         if (!(sharpConfig.resizeOptions.withoutEnlargement && (width > metadata.width || height > metadata.height))) {
-            return false;
+            return true;
         }
+
         let message = `${messagePrefix} Image enlargement is detected`
+
         if (width) {
             message += `\n  real width: ${metadata.width}px, required width: ${width}px`
         }
+
         if (height) {
             message += `\n  real height: ${metadata.height}px, required height: ${height}px`
         }
+
         if (sharpConfig.errorOnEnlargement) {
             throw Error(message)
         }
+
         if (sharpConfig.skipOnEnlargement) {
             if (!sharpConfig.silent) {
                 Utilities.log(`(skip for processing)`, messagePrefix)
@@ -292,6 +298,7 @@ export default class Images {
             // passing a null file to the callback stops a new image being added to the pipeline for this sharpConfig
             return false;
         }
+
         if (!sharpConfig.silent) {
             Utilities.log(`(skip for enlargement)`, messagePrefix)
         }

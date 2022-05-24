@@ -177,7 +177,7 @@ export class Watcher {
     private cleanTimer(callback: () => void, delay = 1000) {
         let timer = setTimeout(() => {
             callback();
-            window.clearTimeout(timer);
+            clearTimeout(timer);
         }, delay);
     }
 }

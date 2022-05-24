@@ -416,7 +416,7 @@ ${this.siteMap}
     }
 
     async saveAsync(postMeta: PostMeta, thumbnail: string, thumbnailAlt: string, rawEditor) {
-        const postImagePath = `./${this.siteConfig.source}/copy/img/${postMeta.file}`;
+        const postImageCopyPath = `./${this.siteConfig.source}/copy/img/${postMeta.file}`;
         const partialPath = `./${this.siteConfig.source}/partials/${postMeta.file}.html`;
 
         try {
@@ -439,25 +439,28 @@ ${this.siteMap}
         try {
             const postImages = rawEditor.blocks.filter(y => y.type === 'image');
 
-            await fs.mkdir(postImagePath, {recursive: true});
+            await fs.mkdir(postImageCopyPath, {recursive: true});
 
             if (postImages.length > 0) {
                 for (const image of postImages) {
-                    const imageName = Utilities.slugify(image.data.alt) || path.basename(image.data.file.url);
-                    const newPath = `${postImagePath}/${imageName}${path.extname(image.data.file.url)}`;
+                    const imageName = `${Utilities.slugify(image.data.alt) || path.basename(image.data.file.url)}${path.extname(image.data.file.url)}`;
+                    const newPath = `${postImageCopyPath}/${imageName}`;
                     await fs.rename(`.${image.data.file.url}`, newPath);
                     image.data.file.url = newPath.substring(1);
 
-                    image.data.pictureSet = (await this.getPictureSet(newPath, postImagePath, postMeta.file, image.data.alt)).pictureTag;
+                    var pictureSet = await this.getPictureSet(newPath, postImageCopyPath, postMeta.file, image.data.alt);
+
+                    image.data.pictureSet = pictureSet.pictureTag;
                 }
             }
 
             const body = editorJsParser.parser(rawEditor.blocks);
 
-            const newThumbnailPath = `${postImagePath}/${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
+            const thumbnailName = `${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
+            const newThumbnailPath = `${postImageCopyPath}/${thumbnailName}`;
             await fs.rename(thumbnail, newThumbnailPath);
 
-            const thumbnailPictureSet = await this.getPictureSet(newThumbnailPath, postImagePath, postMeta.file, thumbnailAlt);
+            const thumbnailPictureSet = await this.getPictureSet(newThumbnailPath, postImageCopyPath, postMeta.file, thumbnailAlt);
 
             let newPost = (await this.loadTemplateAsync('empty-post'))
                 .replace(/==title==/g, postMeta.title)
@@ -483,7 +486,7 @@ ${this.siteMap}
         } catch (e) {
             this.saveInProgress = false;
             console.error(e);
-            await FileHelpers.removeDirectoryAsync(postImagePath, true);
+            await FileHelpers.removeDirectoryAsync(postImageCopyPath, true);
             await FileHelpers.removeFileAsync(partialPath);
             return {
                 success: false,
