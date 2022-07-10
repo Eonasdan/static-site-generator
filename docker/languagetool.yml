@@ -5,4 +5,4 @@ services:
     image: erikvl87/languagetool
     container_name: languagetool
     ports:
-      - 8010:8010  # Using default port from the image
+      - "8010:8010"  # Using default port from the image

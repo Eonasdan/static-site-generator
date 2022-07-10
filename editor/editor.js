@@ -13,6 +13,7 @@ class Editor {
     excerptLow = document.getElementById('excerptLow');
     excerptHigh = document.getElementById('excerptHigh');
     thumbnailHelp = document.getElementById('thumbnailHelp');
+    processingLanguageTools = false;
 
     img = new Image();
     fileReader = new FileReader();
@@ -141,20 +142,69 @@ class Editor {
                     .filter(x => x.text)
                     .flatMap(x => x.text)
                     .join(' ')
-                    .replaceAll('<code class="inline-code">', '')
-                    .replaceAll('</code>', '');
-                /* const response = fetch('http://localhost:8010/v2/check', {
-                *    method: 'POST',
-                     body: JSON.stringify({
-                         data: {
-                             text: parsed
-                         },
-                         language: 'en-US'
-                     })
-                 })
-                     .then(response => response.json()).then(x => {
-                         debugger;
-                     });*/
+                // .replaceAll('<code class="inline-code">', '')
+                // .replaceAll('</code>', '');
+                if (rawText) {
+                    this.processingLanguageTools = true;
+
+                    // function stripHtml(dirtyString) {
+                    //     const doc = new DOMParser().parseFromString(dirtyString, 'text/html');
+                    //     return doc.body.textContent || '';
+                    // }
+
+                    fetch('/lt/check', {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                        },
+                        body: rawText
+                    })
+                        .then(response => response.json()).then(x => {
+                        this.handleLanguageTools(x);
+                    });
+                    // this.handleLanguageTools({
+                    //     matches: [
+                    //         {
+                    //             "message": "Did you mean “to have”?",
+                    //             "shortMessage": "Possible typo",
+                    //             "replacements": [
+                    //                 {
+                    //                     "value": "to have"
+                    //                 }
+                    //             ],
+                    //             "offset": 126,
+                    //             "length": 8,
+                    //             "context": {
+                    //                 "text": "...ocessors. Write or paste your text here too have it checked continuously. Errors will be...",
+                    //                 "offset": 43,
+                    //                 "length": 8
+                    //             },
+                    //             "sentence": "Write or paste your text here too have it checked continuously.",
+                    //             "type": {
+                    //                 "typeName": "Other"
+                    //             },
+                    //             "rule": {
+                    //                 "id": "TOO_TO",
+                    //                 "subId": "1",
+                    //                 "sourceFile": "grammar.xml",
+                    //                 "description": "too go (to go)",
+                    //                 "issueType": "misspelling",
+                    //                 "urls": [
+                    //                     {
+                    //                         "value": "https://en.wiktionary.org/wiki/too"
+                    //                     }
+                    //                 ],
+                    //                 "category": {
+                    //                     "id": "CONFUSED_WORDS",
+                    //                     "name": "Commonly Confused Words"
+                    //                 }
+                    //             },
+                    //             "ignoreForIncompleteSentence": true,
+                    //             "contextForSureMatch": 4
+                    //         }
+                    //     ]
+                    // });
+                }
 
                 localStorage.setItem('draft-editor', JSON.stringify(data));
                 //return;
@@ -282,6 +332,10 @@ class Editor {
             console.log(e);
             errorToast.show();
         }
+    }
+
+    handleLanguageTools(x) {
+        this.processingLanguageTools = false;
     }
 }
 

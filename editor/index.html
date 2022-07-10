@@ -21,9 +21,8 @@
     <link rel="stylesheet" href="/css/style.min.css"/>
 
     <!-- editor -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
-            crossorigin="anonymous"></script>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0-beta1/js/bootstrap.min.js" integrity="sha512-Hqe3s+yLpqaBbXM6VA0cnj/T56ii5YjNrMT9v+us11Q81L0wzUG0jEMNECtugqNu2Uq5MSttCg0p4KK0kCPVaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
@@ -33,6 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@eonasdan/editorjs-code@3.0.2/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@eonasdan/editorjs-parser@1.0.2/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.3.1/dist/bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.5/umd/popper.min.js" integrity="sha512-8cU710tp3iH9RniUh6fq5zJsGnjLzOWLWdZqBMLtqaoZUA6AWIE34lwMB3ipUNiTBP5jEZKY95SfbNnQ8cCKvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <link rel="stylesheet" href="/editor/styles.css"/>
 </head>
@@ -302,5 +302,136 @@
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js" integrity="sha512-/kVH1uXuObC0iYgxxCKY41JdWOkKOxorFVmip+YVifKsJ4Au/87EisD1wty7vxN2kAhnWh6Yc8o/dSAXj6Oz7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha512-BttltKXFyWnGZQcRWj6osIg7lbizJchuAMotOkdLxHxwt/Hyo+cl47bZU0QADg+Qt5DJwni3SbYGXeGMB5cBcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div id="tooltip" role="tooltip">
+    I'm a tooltip
+    <div id="arrow" data-popper-arrow></div>
+</div>
+<script>
+    const ltMatchesEls = document.querySelectorAll('code.inline-code');
+    const ltMatches = [];
+    const tooltip = document.querySelector('#tooltip');
+
+    function popperfactory(element) {
+        return Popper.createPopper(element, tooltip, {
+            modifiers: [
+                {
+                    name: 'offset',
+                    options: {
+                        offset: [0, 8],
+                    },
+                },
+            ],
+        });
+    }
+
+    function show(popperInstance) {
+        // Make the tooltip visible
+        tooltip.setAttribute('data-show', '');
+
+        // Enable the event listeners
+        popperInstance.setOptions((options) => ({
+            ...options,
+            modifiers: [
+                ...options.modifiers,
+                { name: 'eventListeners', enabled: true },
+            ],
+        }));
+
+        // Update its position
+        popperInstance.update();
+    }
+
+    function hide(popperInstance) {
+        // Hide the tooltip
+        tooltip.removeAttribute('data-show');
+
+        // Disable the event listeners
+        popperInstance.setOptions((options) => ({
+            ...options,
+            modifiers: [
+                ...options.modifiers,
+                { name: 'eventListeners', enabled: false },
+            ],
+        }));
+    }
+    // const showEvents = ['mouseenter', 'focus'];
+    // const hideEvents = ['mouseleave', 'blur'];
+
+    // showEvents.forEach((event) => {
+    //   button.addEventListener(event, show);
+    // });
+
+    // hideEvents.forEach((event) => {
+    //   button.addEventListener(event, hide);
+    // });
+
+    function dothing() {
+        document.querySelectorAll('code.inline-code').forEach((x) => {
+            // ltMatches.push({
+            //   el: x,
+            //   pi: popperfactory(x),
+            // });
+            x.addEventListener('mouseenter', () => show(popperfactory(x)));
+            //x.addEventListener('mouseleave', () =>hide(popperfactory(x)));
+        });
+    }
+</script>
+<style>
+    #tooltip {
+        background-color: #333;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+
+    #arrow,
+    #arrow::before {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: inherit;
+    }
+
+    #arrow {
+        visibility: hidden;
+    }
+
+    #arrow::before {
+        visibility: visible;
+        content: '';
+        transform: rotate(45deg);
+    }
+
+    #tooltip {
+        display: none;
+    }
+
+    #tooltip[data-show] {
+        display: block;
+    }
+
+    #tooltip[data-popper-placement^='top'] > #arrow {
+        bottom: -4px;
+    }
+
+    #tooltip[data-popper-placement^='bottom'] > #arrow {
+        top: -4px;
+    }
+
+    #tooltip[data-popper-placement^='left'] > #arrow {
+        right: -4px;
+    }
+
+    #tooltip[data-popper-placement^='right'] > #arrow {
+        left: -4px;
+    }
+
+    lt {
+        text-decoration: underline;
+        text-decoration-color: red;
+    }
+</style>
 </body>
 </html>

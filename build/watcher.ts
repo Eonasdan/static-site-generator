@@ -1,10 +1,10 @@
-import {IncomingMessage, ServerResponse} from 'http';
+import {IncomingMessage, ServerResponse, request} from 'http';
 import formidable from 'formidable';
 import * as path from 'path';
 
 const chokidar = require('chokidar');
 
-import { ParvusServer } from '@eonasdan/parvus-server';
+import {ParvusServer} from '@eonasdan/parvus-server';
 import Build from './build';
 import PostMeta from './models/post-meta';
 import PostAuthor from './models/post-author';
@@ -43,6 +43,10 @@ export class Watcher {
                 {
                     middleware: this.useDefaultHandlerAsync.bind(this),
                     route: '/img_temp/*'
+                },
+                {
+                    middleware: this.languagetoolProxy.bind(this),
+                    route: '/lt/*'
                 }
             ]
         });
@@ -52,6 +56,56 @@ export class Watcher {
 
     refreshBrowser() {
         this.parvusServer.refreshBrowser();
+    }
+
+    async languagetoolProxy(req: IncomingMessage, res: ServerResponse) {
+        try {
+            const options = {
+                hostname: 'localhost',
+                port: 8010,
+                path: '/v2/check',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            };
+
+            const requestBody = await new Promise(resolve => {
+                let body = '';
+                req.on('data', (chunk) => {
+                    body += chunk;
+                });
+                req.on('end', () => {
+                    resolve(body);
+                });
+            })
+
+            const outbound = request(options, (r) => {
+                let body = '';
+                r.on('data', (chunk) => {
+                    body += chunk;
+                });
+                r.on('end', () => {
+                    if (body.startsWith('{')) res.write(body);
+                    else {
+                        res.writeHead(500);
+                        res.write(JSON.stringify({
+                            message: body
+                        }))
+                    }
+                    res.end();
+                });
+            });
+            outbound.write(`language=en-US&text=${requestBody}`);
+            outbound.end();
+        }
+        catch (e) {
+            console.log('Failed to call language tools', e);
+            res.writeHead(500);
+            res.end(JSON.stringify({
+                'success': 0
+            }));
+        }
     }
 
     async uploadMiddlewareAsync(req: IncomingMessage, res: ServerResponse) {

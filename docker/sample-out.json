@@ -1,0 +1,543 @@
+{
+  "software": {
+    "name": "LanguageTool",
+    "version": "5.7",
+    "buildDate": "2022-05-24 19:41:20 +0000",
+    "apiVersion": 1,
+    "premium": false,
+    "premiumHint": "You might be missing errors only the Premium version can find. Contact us at support<at>languagetoolplus.com.",
+    "status": ""
+  },
+  "warnings": {
+    "incompleteResults": false
+  },
+  "language": {
+    "name": "English (US)",
+    "code": "en-US",
+    "detectedLanguage": {
+      "name": "English (US)",
+      "code": "en-US",
+      "confidence": 0.99999726
+    }
+  },
+  "matches": [
+    {
+      "message": "Did you mean “to have”?",
+      "shortMessage": "Possible typo",
+      "replacements": [
+        {
+          "value": "to have"
+        }
+      ],
+      "offset": 126,
+      "length": 8,
+      "context": {
+        "text": "...ocessors. Write or paste your text here too have it checked continuously. Errors will be...",
+        "offset": 43,
+        "length": 8
+      },
+      "sentence": "Write or paste your text here too have it checked continuously.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "TOO_TO",
+        "subId": "1",
+        "sourceFile": "grammar.xml",
+        "description": "too go (to go)",
+        "issueType": "misspelling",
+        "urls": [
+          {
+            "value": "https://en.wiktionary.org/wiki/too"
+          }
+        ],
+        "category": {
+          "id": "CONFUSED_WORDS",
+          "name": "Commonly Confused Words"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": 4
+    },
+    {
+      "message": "Possible spelling mistake. ‘colours’ is British English.",
+      "shortMessage": "",
+      "replacements": [
+        {
+          "value": "colors",
+          "shortDescription": "English (US)"
+        }
+      ],
+      "offset": 199,
+      "length": 7,
+      "context": {
+        "text": "... Errors will be underlined in different colours: we will mark seplling errors with red ...",
+        "offset": 43,
+        "length": 7
+      },
+      "sentence": "Errors will be underlined in different colours: we will mark seplling errors with red underilnes.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "MORFOLOGIK_RULE_EN_US",
+        "description": "Possible spelling mistake",
+        "issueType": "misspelling",
+        "urls": [
+          {
+            "value": "https://languagetool.org/insights/post/our-or/#colour-or-color-%E2%80%94-colourise-or-colorize"
+          }
+        ],
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "Possible spelling mistake found.",
+      "shortMessage": "Spelling mistake",
+      "replacements": [
+        {
+          "value": "selling"
+        },
+        {
+          "value": "spelling"
+        }
+      ],
+      "offset": 221,
+      "length": 8,
+      "context": {
+        "text": "...ined in different colours: we will mark seplling errors with red underilnes. Furthermore...",
+        "offset": 43,
+        "length": 8
+      },
+      "sentence": "Errors will be underlined in different colours: we will mark seplling errors with red underilnes.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "MORFOLOGIK_RULE_EN_US",
+        "description": "Possible spelling mistake",
+        "issueType": "misspelling",
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "Possible spelling mistake found.",
+      "shortMessage": "Spelling mistake",
+      "replacements": [
+        {
+          "value": "underlines"
+        }
+      ],
+      "offset": 246,
+      "length": 10,
+      "context": {
+        "text": "...: we will mark seplling errors with red underilnes. Furthermore grammar error's are highli...",
+        "offset": 43,
+        "length": 10
+      },
+      "sentence": "Errors will be underlined in different colours: we will mark seplling errors with red underilnes.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "MORFOLOGIK_RULE_EN_US",
+        "description": "Possible spelling mistake",
+        "issueType": "misspelling",
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "A comma may be missing after the conjunctive/linking adverb ‘Furthermore’.",
+      "shortMessage": "Punctuation error",
+      "replacements": [
+        {
+          "value": "Furthermore,"
+        }
+      ],
+      "offset": 258,
+      "length": 11,
+      "context": {
+        "text": "...rk seplling errors with red underilnes. Furthermore grammar error's are highlighted in yell...",
+        "offset": 43,
+        "length": 11
+      },
+      "sentence": "Furthermore grammar error's are highlighted in yellow.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "SENT_START_CONJUNCTIVE_LINKING_ADVERB_COMMA",
+        "subId": "1",
+        "sourceFile": "grammar.xml",
+        "description": "Commas after conjunctive/linking adverbs in front of a new sentence.",
+        "issueType": "typographical",
+        "urls": [
+          {
+            "value": "https://languagetool.org/insights/post/linking-words/"
+          }
+        ],
+        "category": {
+          "id": "PUNCTUATION",
+          "name": "Punctuation"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": 10
+    },
+    {
+      "message": "Did you mean the plural noun “errors” instead of the possessive?",
+      "shortMessage": "Extraneous apostrophe",
+      "replacements": [
+        {
+          "value": "errors"
+        }
+      ],
+      "offset": 278,
+      "length": 7,
+      "context": {
+        "text": "...ith red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool...",
+        "offset": 43,
+        "length": 7
+      },
+      "sentence": "Furthermore grammar error's are highlighted in yellow.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "APOS_ARE",
+        "subId": "1",
+        "sourceFile": "grammar.xml",
+        "description": "extraneous apostrophes before 'are'",
+        "issueType": "typographical",
+        "category": {
+          "id": "PUNCTUATION",
+          "name": "Punctuation"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 1
+    },
+    {
+      "message": "Consider replacing this phrase with the adverb “reliably” to avoid wordiness.",
+      "shortMessage": "",
+      "replacements": [
+        {
+          "value": "reliably"
+        }
+      ],
+      "offset": 350,
+      "length": 20,
+      "context": {
+        "text": "...w. LanguageTool also marks style issues in a reliable manner by underlining them in blue. did you kn...",
+        "offset": 43,
+        "length": 20
+      },
+      "sentence": "LanguageTool also marks style issues in a reliable manner by underlining them in blue.",
+      "type": {
+        "typeName": "Hint"
+      },
+      "rule": {
+        "id": "IN_A_X_MANNER",
+        "subId": "4",
+        "sourceFile": "grammar.xml",
+        "description": "Wordiness: in a ... manner",
+        "issueType": "style",
+        "category": {
+          "id": "REDUNDANCY",
+          "name": "Redundant Phrases"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": 6
+    },
+    {
+      "message": "This sentence does not start with an uppercase letter.",
+      "shortMessage": "",
+      "replacements": [
+        {
+          "value": "Did"
+        }
+      ],
+      "offset": 400,
+      "length": 3,
+      "context": {
+        "text": "...ble manner by underlining them in blue. did you know that you can sea synonyms by d...",
+        "offset": 43,
+        "length": 3
+      },
+      "sentence": "did you know that you can sea synonyms by double clicking a word?",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "UPPERCASE_SENTENCE_START",
+        "description": "Checks that a sentence starts with an uppercase letter",
+        "issueType": "typographical",
+        "category": {
+          "id": "CASING",
+          "name": "Capitalization"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": -1
+    },
+    {
+      "message": "The verb “double-clicking” is spelled with a hyphen.",
+      "shortMessage": "",
+      "replacements": [
+        {
+          "value": "double-clicking"
+        }
+      ],
+      "offset": 442,
+      "length": 15,
+      "context": {
+        "text": "...d you know that you can sea synonyms by double clicking a word? Its a impressively versatile to...",
+        "offset": 43,
+        "length": 15
+      },
+      "sentence": "did you know that you can sea synonyms by double clicking a word?",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "DOUBLE_HYPHEN",
+        "subId": "6",
+        "sourceFile": "grammar.xml",
+        "description": "missing hyphen in 'double check/click/cross/park'",
+        "issueType": "grammar",
+        "urls": [
+          {
+            "value": "https://languagetool.org/insights/post/hyphen/#hyphenating-verbs-modifies-their-meaning"
+          }
+        ],
+        "category": {
+          "id": "GRAMMAR",
+          "name": "Grammar"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 2
+    },
+    {
+      "message": "Did you mean “it's” (short for ‘it is’) instead of ‘its’ (possessive pronoun)?",
+      "shortMessage": "Possible typo",
+      "replacements": [
+        {
+          "value": "It's"
+        }
+      ],
+      "offset": 466,
+      "length": 3,
+      "context": {
+        "text": "...sea synonyms by double clicking a word? Its a impressively versatile tool, e.g. if ...",
+        "offset": 43,
+        "length": 3
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "IT_IS",
+        "subId": "25",
+        "sourceFile": "grammar.xml",
+        "description": "its vs. it's",
+        "issueType": "misspelling",
+        "urls": [
+          {
+            "value": "https://languagetool.org/insights/post/its/"
+          }
+        ],
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": 8
+    },
+    {
+      "message": "Use “an” instead of ‘a’ if the following word starts with a vowel sound, e.g. ‘an article’, ‘an hour’.",
+      "shortMessage": "Wrong article",
+      "replacements": [
+        {
+          "value": "an"
+        }
+      ],
+      "offset": 470,
+      "length": 1,
+      "context": {
+        "text": "...synonyms by double clicking a word? Its a impressively versatile tool, e.g. if yo...",
+        "offset": 43,
+        "length": 1
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "EN_A_VS_AN",
+        "description": "Use of 'a' vs. 'an'",
+        "issueType": "misspelling",
+        "urls": [
+          {
+            "value": "https://languagetool.org/insights/post/indefinite-articles/"
+          }
+        ],
+        "category": {
+          "id": "MISC",
+          "name": "Miscellaneous"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 1
+    },
+    {
+      "message": "Possible spelling mistake found.",
+      "shortMessage": "Spelling mistake",
+      "replacements": [
+        {
+          "value": "you'd"
+        }
+      ],
+      "offset": 509,
+      "length": 4,
+      "context": {
+        "text": "... a impressively versatile tool, e.g. if youd like to tell a colleague from over sea'...",
+        "offset": 43,
+        "length": 4
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "EN_CONTRACTION_SPELLING",
+        "description": "Spelling of English contractions",
+        "issueType": "misspelling",
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "Did you mean “overseas”?",
+      "shortMessage": "",
+      "replacements": [
+        {
+          "value": "overseas"
+        }
+      ],
+      "offset": 544,
+      "length": 10,
+      "context": {
+        "text": ".... if youd like to tell a colleague from over sea's about what happened at 5 PM in the afte...",
+        "offset": 43,
+        "length": 10
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "OVER_SEAS",
+        "subId": "2",
+        "sourceFile": "grammar.xml",
+        "description": "over seas (overseas)",
+        "issueType": "misspelling",
+        "category": {
+          "id": "TYPOS",
+          "name": "Possible Typo"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "This is redundant. Consider using “PM”.",
+      "shortMessage": "Redundant phrase",
+      "replacements": [
+        {
+          "value": "PM"
+        }
+      ],
+      "offset": 580,
+      "length": 19,
+      "context": {
+        "text": "...rom over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+        "offset": 43,
+        "length": 19
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Hint"
+      },
+      "rule": {
+        "id": "PM_IN_THE_EVENING",
+        "subId": "1",
+        "sourceFile": "grammar.xml",
+        "description": "PM in the evening (PM)",
+        "issueType": "style",
+        "category": {
+          "id": "REDUNDANCY",
+          "name": "Redundant Phrases"
+        }
+      },
+      "ignoreForIncompleteSentence": false,
+      "contextForSureMatch": 0
+    },
+    {
+      "message": "The date 27 May 2007 is not a Monday, but a Sunday.",
+      "shortMessage": "",
+      "replacements": [],
+      "offset": 603,
+      "length": 19,
+      "context": {
+        "text": "...at happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+        "offset": 43,
+        "length": 19
+      },
+      "sentence": "Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.",
+      "type": {
+        "typeName": "Other"
+      },
+      "rule": {
+        "id": "DATE_WEEKDAY",
+        "subId": "1",
+        "sourceFile": "grammar.xml",
+        "description": "Weekday doesn't match date",
+        "issueType": "inconsistency",
+        "urls": [
+          {
+            "value": "https://www.timeanddate.com/calendar/?year=2007"
+          }
+        ],
+        "category": {
+          "id": "SEMANTICS",
+          "name": "Semantics"
+        }
+      },
+      "ignoreForIncompleteSentence": true,
+      "contextForSureMatch": 5
+    }
+  ]
+}
