@@ -111,3 +111,85 @@
 .cdx-notify__cross::after, .cdx-notify__cross::before {
     background: white;
 }
+
+/* LT bits */
+#lt-dialog-arrow,
+#lt-dialog-arrow::before {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: inherit;
+}
+
+#lt-dialog-arrow {
+    visibility: hidden;
+}
+
+#lt-dialog-arrow::before {
+    visibility: visible;
+    content: '';
+    transform: rotate(45deg);
+}
+
+#lt-dialog {
+    display: none;
+    z-index: 9;
+}
+
+#lt-dialog .toast {
+    background-color: #424242;
+    color: white;
+}
+
+#lt-close {
+    color: white !important;
+}
+
+#lt-dialog[data-show] {
+    display: block;
+}
+
+#lt-dialog[data-popper-placement^='top'] > #lt-dialog-arrow {
+    bottom: -4px;
+}
+
+#lt-dialog[data-popper-placement^='bottom'] > #lt-dialog-arrow {
+    top: -4px;
+}
+
+#lt-dialog[data-popper-placement^='left'] > #lt-dialog-arrow {
+    right: -4px;
+}
+
+#lt-dialog[data-popper-placement^='right'] > #lt-dialog-arrow {
+    left: -4px;
+}
+
+.lt-match {
+    text-decoration: underline;
+    text-decoration-color: #eb5757;
+    text-decoration-thickness: 2px;
+    cursor: pointer;
+    background-color: rgba(231, 90, 90, 0.3);
+}
+
+#lt-ignore {
+    cursor: pointer;
+}
+
+.lt-misspelling {
+    color: white;
+    background-color:#eb5757!important;
+    text-decoration-color: #eb5757;
+}
+.lt-custom-suggestion, .lt-style {
+    color: white;
+    background-color:#3B29FF!important;
+    text-decoration-color: #3B29FF;
+}
+.lt-grammar, .lt-punctuation {
+    color: white;
+    background-color:#f2b24c!important;
+    text-decoration-color: #f2b24c;
+}
+/* end LT */

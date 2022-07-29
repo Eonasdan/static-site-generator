@@ -57,7 +57,7 @@ export default class Build {
         await this.update404Async();
         await this.prepareCssAsync();
         await this.updatePostsAsync();
-        this.minifyJsAsync().then();
+        await this.minifyJsAsync();
     }
 
     reset() {

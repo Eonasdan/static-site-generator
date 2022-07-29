@@ -1,4 +1,4 @@
-/* global Header, Checklist, List, ImageTool, CodeTool, InlineCode, Prism, EditorJS, eonasdan */
+/* global Header, Checklist, List, ImageTool, CodeTool, InlineCode, Prism, EditorJS, eonasdan, Marker */
 
 class Editor {
     previewButton = document.getElementById('previewButton');
@@ -13,7 +13,22 @@ class Editor {
     excerptLow = document.getElementById('excerptLow');
     excerptHigh = document.getElementById('excerptHigh');
     thumbnailHelp = document.getElementById('thumbnailHelp');
-    processingLanguageTools = false;
+
+
+    /**
+     * @typedef {object} BlockLanguageToolData
+     * @property {string} id - Editor Js Block Id
+     * @property {string} hash - MD5 hash of block text
+     */
+
+    languageTools = new LanguageTools();
+
+    /**
+     *
+     * @type {BlockLanguageToolData[]}
+     */
+    blockLanguageToolData = [];
+    updatingBlock = false;
 
     img = new Image();
     fileReader = new FileReader();
@@ -25,6 +40,19 @@ class Editor {
         minute: "numeric",
         second: "numeric",
     });
+
+    constructor() {
+        this.languageTools.ignoreSuggestionHandler =
+            this.ignoreSuggestionHandler.bind(this);
+
+        this.languageTools.replaceSuggestionHandler =
+            this.replaceSuggestionHandler.bind(this);
+
+        this.languageTools.getActiveMatchHandler =
+            this.getActiveMatchHandler.bind(this);
+
+        this.languageTools.setup();
+    }
 
     dateForInput = () => {
         return new Date().toISOString().slice(0, -14)
@@ -101,13 +129,19 @@ class Editor {
 
     setupEditor() {
         const draftEditor = JSON.parse(localStorage.getItem('draft-editor') || '{}');
+        this.blockLanguageToolData = JSON.parse(localStorage.getItem('lt-data') || []);
 
         // noinspection JSUnusedGlobalSymbols
         this.editor = new EditorJS({
+            logLevel: 'ERROR',
             holder: 'editorjs',
             placeholder: 'Let`s write an awesome story!',
-            onChange: () => this.onEditorSave(),
+            //todo proper async
+            onChange: async () => await this.onEditorSave(),
             tools: {
+                maker: {
+                    class: Marker,
+                },
                 header: Header,
                 checklist: {
                     class: Checklist,
@@ -130,86 +164,29 @@ class Editor {
                     class: InlineCode
                 },
             },
-            data: draftEditor
+            data: draftEditor,
+            onReady: () => {
+                this.languageTools.registerMatchClick()
+            }
         });
     }
 
-    onEditorSave() {
-        this.editor.save().then(data => {
-            if (data) {
-                const rawText = data.blocks
-                    .flatMap(x => x.data)
-                    .filter(x => x.text)
-                    .flatMap(x => x.text)
-                    .join(' ')
-                // .replaceAll('<code class="inline-code">', '')
-                // .replaceAll('</code>', '');
-                if (rawText) {
-                    this.processingLanguageTools = true;
+    async onEditorSave() {
+        const data = await this.editor.save();
+        if (data && !this.updatingBlock) {
+            this.start = new Date().getTime();
+            this.ltBounce(data, 3000);
+        }
+        localStorage.setItem('draft-editor', JSON.stringify(data));
+    }
 
-                    // function stripHtml(dirtyString) {
-                    //     const doc = new DOMParser().parseFromString(dirtyString, 'text/html');
-                    //     return doc.body.textContent || '';
-                    // }
+    bounceTimer;
 
-                    fetch('/lt/check', {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                        },
-                        body: rawText
-                    })
-                        .then(response => response.json()).then(x => {
-                        this.handleLanguageTools(x);
-                    });
-                    // this.handleLanguageTools({
-                    //     matches: [
-                    //         {
-                    //             "message": "Did you mean “to have”?",
-                    //             "shortMessage": "Possible typo",
-                    //             "replacements": [
-                    //                 {
-                    //                     "value": "to have"
-                    //                 }
-                    //             ],
-                    //             "offset": 126,
-                    //             "length": 8,
-                    //             "context": {
-                    //                 "text": "...ocessors. Write or paste your text here too have it checked continuously. Errors will be...",
-                    //                 "offset": 43,
-                    //                 "length": 8
-                    //             },
-                    //             "sentence": "Write or paste your text here too have it checked continuously.",
-                    //             "type": {
-                    //                 "typeName": "Other"
-                    //             },
-                    //             "rule": {
-                    //                 "id": "TOO_TO",
-                    //                 "subId": "1",
-                    //                 "sourceFile": "grammar.xml",
-                    //                 "description": "too go (to go)",
-                    //                 "issueType": "misspelling",
-                    //                 "urls": [
-                    //                     {
-                    //                         "value": "https://en.wiktionary.org/wiki/too"
-                    //                     }
-                    //                 ],
-                    //                 "category": {
-                    //                     "id": "CONFUSED_WORDS",
-                    //                     "name": "Commonly Confused Words"
-                    //                 }
-                    //             },
-                    //             "ignoreForIncompleteSentence": true,
-                    //             "contextForSureMatch": 4
-                    //         }
-                    //     ]
-                    // });
-                }
-
-                localStorage.setItem('draft-editor', JSON.stringify(data));
-                //return;
-            }
-        });
+    ltBounce(data, timeOut) {
+        clearTimeout(this.bounceTimer);
+        this.bounceTimer = setTimeout(() => {
+            this.languageToolCheck(data);
+        }, timeOut);
     }
 
     updateExcerpt() {
@@ -231,6 +208,8 @@ class Editor {
         this.metaBlur({target: {name: 'postDate', value: this.postDate.value}});
         this.areYouSureModalConfirm.removeEventListener('click', this.clear);
         this.areYouSureModal.hide();
+        localStorage.setItem('lt-data', null);
+        this.blockLanguageToolData = [];
     }
 
     toggleShow(...elements) {
@@ -303,6 +282,8 @@ class Editor {
         }
         const outputData = await this.editor.save();
         if (!outputData) return;
+        //todo verify that this cleans the markers before posting.
+        outputData.blocks.forEach(x => x.data.text = this.languageTools.cleanupMarkers(x.data.text));
         this.form.classList.add('was-validated');
         const formData = new FormData(this.form);
         formData.append('editor', JSON.stringify(outputData));
@@ -334,8 +315,99 @@ class Editor {
         }
     }
 
-    handleLanguageTools(x) {
-        this.processingLanguageTools = false;
+    languageToolCheck(data) {
+        data.blocks
+            .filter(
+                (block) =>
+                    //has text
+                    block.data.text &&
+                    //is not currently processing
+                    //!this.languageTools.processingIds.includes(block.id) &&
+                    //doesn't have a hash or the hash is different
+                    (!this.blockLanguageToolData.find((x) => x.id === block.id) ||
+                        md5(block.data.text) !==
+                        this.blockLanguageToolData.find((x) => x.id === block.id).hash)
+            )
+            .forEach((block) => {
+                this.languageTools
+                    .process(block.data.text, block.id)
+                    .then(async (results) => {
+                        if (results.error) {
+                            console.log(results.error, results.exception);
+                            return;
+                        }
+
+                        const currentData = (await this.editor.save())
+                            .blocks.find(x => x.id === block.id)
+                            .data.text;
+
+                        const currentHash = md5(currentData);
+                        //if the user has changed the text since we checked with LT
+                        //because of how editor js works, we can't update the block text
+                        if (currentHash !== md5(block.data.text)) return;
+
+                        const existing = this.blockLanguageToolData.find(x => x.id === block.id);
+
+                        if (existing) {
+                            existing.hash = md5(results.newText);
+                            existing.matches = results.matches;
+                        } else {
+                            this.blockLanguageToolData.push({
+                                id: block.id,
+                                hash: md5(results.newText),
+                                matches: results.matches,
+                            });
+                        }
+
+                        localStorage.setItem('lt-data', JSON.stringify(this.blockLanguageToolData));
+
+                        this.updateBlockTextAndBreak(block.id, results.newText);
+                        this.languageTools.registerMatchClick();
+                    });
+            });
+    }
+
+    getActiveMatchHandler(element) {
+        return this.blockLanguageToolData
+            .find((x) => x.id === element.dataset.id)
+            ?.matches.find((x) => x.id === +element.dataset.index);
+    }
+
+    async ignoreSuggestionHandler() {
+        const element = this.languageTools.activeMatch.element;
+        const blockData = await this.getBlockDataForElement(element);
+        let newText = blockData.text.replace(element.outerHTML, element.innerHTML);
+        this.updateBlockTextAndBreak(blockData.id, newText);
+        this.languageTools.hideAndRegisterClick();
+    }
+
+    async replaceSuggestionHandler(element, value) {
+        const blockData = await this.getBlockDataForElement(element);
+        this.updateBlockTextAndBreak(
+            blockData.id,
+            blockData.text.replace(element.outerHTML, value)
+        );
+        this.languageTools.hideAndRegisterClick();
+    }
+
+    async getBlockDataForElement(element) {
+        const id = element.dataset.id;
+        const data = await this.editor.save();
+        const block = data.blocks.find((x) => x.id === id);
+        return {
+            id,
+            text: block.data.text,
+        };
+    }
+
+    updateBlockTextAndBreak(id, newText) {
+        this.updatingBlock = true;
+        this.editor.blocks.update(id, {
+            text: newText,
+        });
+        setTimeout(() => {
+            this.updatingBlock = false;
+        }, 300);
     }
 }
 
