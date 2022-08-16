@@ -39,7 +39,7 @@ class LanguageTools {
 
     generateSuggestionButton(element) {
         const fragment = document.createDocumentFragment();
-        this.activeMatch.replacements.forEach((replacement) => {
+        this.activeMatch.replacements.slice(0, 10).forEach((replacement) => {
             const value = replacement.value;
             const btn = document.createElement('button');
             btn.classList.add(...['btn', 'btn-primary', 'mb-2', 'me-2']);
@@ -103,7 +103,7 @@ class LanguageTools {
         this.tooltip.removeAttribute('data-show');
 
         // Disable the event listeners
-        this.activeMatch?.popperInstance.setOptions((options) => ({
+        this.activeMatch?.popperInstance?.setOptions((options) => ({
             ...options,
             modifiers: [
                 ...options.modifiers,
