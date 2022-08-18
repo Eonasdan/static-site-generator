@@ -11,5 +11,14 @@
   "server" : {
     "serveFrom": "site",
     "port": 62296
+  },
+  "defaultAuthor": {
+    "name": "Bo Staff",
+    "url": "https://eonasdan.github.io/static-site-generator/",
+    "avatar": "https://placekitten.com/120/120",
+    "bio": "Check me out. I do stuff."
+  },
+  "services": {
+    "languageTools": false
   }
 }

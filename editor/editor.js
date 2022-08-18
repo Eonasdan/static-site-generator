@@ -1,5 +1,31 @@
 /* global Header, Checklist, List, ImageTool, CodeTool, InlineCode, Prism, EditorJS, eonasdan, Marker */
 
+/** @typedef {object} SiteConfig
+ * @property {object} site
+ * @property {string} site.root
+ * @property {string} site.subfolder
+ * @property {object} output
+ * @property {string} output.main
+ * @property {string} output.posts
+ * @property {string} source
+ * @property {object} server
+ * @property {string} server.serveFrom
+ * @property {number} server.port
+ * @property {object} defaultAuthor
+ * @property {string} defaultAuthor.name
+ * @property {string} defaultAuthor.url
+ * @property {string} defaultAuthor.avatar
+ * @property {string} defaultAuthor.bio
+ * @property {object} services
+ * @property {boolean} services.languageTools
+ */
+
+/**
+ * @typedef {object} BlockLanguageToolData
+ * @property {string} id - Editor Js Block Id
+ * @property {string} hash - MD5 hash of block text
+ */
+
 class Editor {
     previewButton = document.getElementById('previewButton');
     editorDiv = document.getElementById('editorContainer');
@@ -14,12 +40,16 @@ class Editor {
     excerptHigh = document.getElementById('excerptHigh');
     thumbnailHelp = document.getElementById('thumbnailHelp');
 
+    toastyContainer = document.getElementById('toasty');
+    toasty = new bootstrap.Toast(this.toastyContainer);
+    toastyClasses = [...this.toastyContainer.classList];
+
 
     /**
-     * @typedef {object} BlockLanguageToolData
-     * @property {string} id - Editor Js Block Id
-     * @property {string} hash - MD5 hash of block text
+     *
+     * @type {SiteConfig}
      */
+    config = undefined;
 
     languageTools = new LanguageTools();
 
@@ -62,7 +92,10 @@ class Editor {
 
     editor = undefined
 
-    ready() {
+    async readyAsync() {
+        this.config = await this.fiddo('/config');
+        if (!this.config.services.languageTools) document.getElementById('runLt').classList.add('d-none');
+
         // noinspection JSValidateTypes
         Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/';
 
@@ -125,11 +158,17 @@ class Editor {
         });
 
         document.getElementById('save').addEventListener('click', this.savePost.bind(this));
+
+        document.getElementById('runLt').addEventListener('click', async () => {
+            const data = await this.editor.save();
+            this.languageToolCheck(data);
+        });
+
     }
 
     setupEditor() {
         const draftEditor = JSON.parse(localStorage.getItem('draft-editor') || '{}');
-        this.blockLanguageToolData = JSON.parse(localStorage.getItem('lt-data') || []);
+        this.blockLanguageToolData = JSON.parse(localStorage.getItem('lt-data')) || [];
 
         // noinspection JSUnusedGlobalSymbols
         this.editor = new EditorJS({
@@ -173,8 +212,7 @@ class Editor {
 
     async onEditorSave() {
         const data = await this.editor.save();
-        if (data && !this.updatingBlock) {
-            this.start = new Date().getTime();
+        if (this.config.services.languageTools && data && !this.updatingBlock) {
             this.ltBounce(data, 3000);
         }
         localStorage.setItem('draft-editor', JSON.stringify(data));
@@ -263,55 +301,52 @@ class Editor {
     restoreForm() {
         const data = JSON.parse(localStorage.getItem('draft-meta') || '{}');
 
-        const {elements} = this.form;
+        const author = (s = '') => {
+            const a = s.replace('postAuthor', '')
+            return (a[0].toLowerCase() + a.slice(1)) || "";
+        };
 
-        for (const [key, value] of Object.entries(data).filter(x => x[0] !== 'thumbnail')) {
-            const field = elements.namedItem(key);
-            if (field) {
+        [...this.form.elements].forEach(field => {
+            const value = data[field.name] || this.config.defaultAuthor[author(field.name)];
+            if (value) {
                 field.value = value
                 field.blur();
             }
-
-        }
+        })
     }
 
     async savePost() {
         if (!this.form.checkValidity()) {
             this.form.classList.add('was-validated');
+            this.errorToast('Form is invalid.');
             return;
         }
         const outputData = await this.editor.save();
         if (!outputData) return;
-        //todo verify that this cleans the markers before posting.
         outputData.blocks.forEach(x => x.data.text = this.languageTools.cleanupMarkers(x.data.text));
         this.form.classList.add('was-validated');
         const formData = new FormData(this.form);
         formData.append('editor', JSON.stringify(outputData));
 
-        const errorToast = new bootstrap.Toast(document.getElementById('errorMessage'));
         const savingToast = new bootstrap.Toast(document.getElementById('savingMessage'), {autohide: false});
         savingToast.show();
 
         try {
-            const response = await (await fetch('/editor/save', {
-                method: 'POST',
-                body: formData
-            })).json();
+            const response = await this.fiddo('/editor/save', 'POST', formData);
             if (response.success) {
                 savingToast.hide();
-                const toast = new bootstrap.Toast(document.getElementById('successMessage'));
-                toast.show();
+                this.successToast();
                 this.clear();
                 setTimeout(() => {
                     window.location.href = response.post;
                 }, 1.5 * 1000);
             } else {
                 savingToast.hide();
-                errorToast.show();
+                this.errorToast();
             }
         } catch (e) {
             console.log(e);
-            errorToast.show();
+            this.errorToast();
         }
     }
 
@@ -405,12 +440,50 @@ class Editor {
         this.editor.blocks.update(id, {
             text: newText,
         });
+
         setTimeout(() => {
             this.updatingBlock = false;
         }, 300);
     }
+
+    errorToast(message = 'Save failed') {
+        this.makeToast(message, 'danger');
+    }
+
+    successToast(message = 'Save successful.') {
+        this.makeToast(message, 'success');
+    }
+
+    /**
+     * Shows a toast message
+     */
+    makeToast(body, style) {
+        this.toastyContainer.classList.remove(...this.toastyContainer.classList);
+        this.toastyContainer.classList.add(...this.toastyClasses);
+        this.toastyContainer.classList.add(`bg-${style}`);
+        this.toastyContainer.getElementsByClassName('toast-body')[0].innerHTML = body;
+
+        this.toasty.show();
+    }
+
+    /**
+     * Get it... it fetches?
+     * @param url
+     * @param method
+     * @param body
+     * @return {Promise<any>}
+     */
+    async fiddo(url, method = 'GET', body = '') {
+        const fetchOptions = {
+            method: method
+        }
+
+        if (method !== 'GET') fetchOptions.body = body;
+
+        return await (await fetch(url, fetchOptions)).json()
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new Editor().ready();
+document.addEventListener('DOMContentLoaded', async () => {
+    await new Editor().readyAsync();
 });

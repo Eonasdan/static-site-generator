@@ -11,5 +11,14 @@ export interface SiteConfig {
     server: {
         serveFrom: string;
         port: number;
+    },
+    defaultAuthor: {
+        name: string;
+        url:  string;
+        avatar:  string;
+        bio: string;
+    },
+    services: {
+        languageTools: boolean
     }
 }

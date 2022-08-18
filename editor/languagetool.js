@@ -128,15 +128,6 @@ class LanguageTools {
     }
 
     async process(text, id) {
-        //todo maybe this is bad. if the user modifies the text, these results will
-        //be invalid anyway
-        // if (this.processingIds.includes(id)) {
-        //   return {
-        //     message: 'This block has a pending request',
-        //   };
-        // }
-        // this.processingIds.push(id);
-
         text = this.cleanupMarkers(text);
 
         //todo error handling

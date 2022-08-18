@@ -45,8 +45,12 @@ export class Watcher {
                     route: '/img_temp/*'
                 },
                 {
-                    middleware: this.languagetoolProxy.bind(this),
+                    middleware: this.languagetoolProxyAsync.bind(this),
                     route: '/lt/*'
+                },
+                {
+                    middleware: this.getConfigAsync.bind(this),
+                    route: "/config"
                 }
             ]
         });
@@ -58,7 +62,12 @@ export class Watcher {
         this.parvusServer.refreshBrowser();
     }
 
-    async languagetoolProxy(req: IncomingMessage, res: ServerResponse) {
+    async getConfigAsync(req: IncomingMessage, res: ServerResponse) {
+        res.write(JSON.stringify(this.builder.siteConfig));
+        res.end();
+    }
+
+    async languagetoolProxyAsync(req: IncomingMessage, res: ServerResponse) {
         try {
             const options = {
                 hostname: 'localhost',
@@ -102,9 +111,10 @@ export class Watcher {
         catch (e) {
             console.log('Failed to call language tools', e);
             res.writeHead(500);
-            res.end(JSON.stringify({
+            res.write(JSON.stringify({
                 'success': 0
             }));
+            res.end();
         }
     }
 
@@ -167,7 +177,8 @@ export class Watcher {
             fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl),
         ), fields.thumbnail, fields.thumbnailAlt, editor);
 
-        res.end(JSON.stringify(result));
+        res.write(JSON.stringify(result));
+        res.end();
     }
 
     async useDefaultHandlerAsync(req: IncomingMessage, res: ServerResponse) {
