@@ -19,6 +19,6 @@
     "bio": "Check me out. I do stuff."
   },
   "services": {
-    "languageTools": false
+    "languageTools": true
   }
 }
