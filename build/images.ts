@@ -67,14 +67,17 @@ export default class Images {
 
     async generateResponsiveImageAsync(file: string, size: Size, destinationDirectory: string, sharpConfig: SharpConfig): Promise<{ file: string, size: Size }> {
         const messagePrefix = `File ${file}: `
-        const image = sharp(file);
+        const imageFormat = Images.format(file);
+        let animated = imageFormat === 'gif';
+        if (sharpConfig.animated !== undefined) animated = sharpConfig.animated;
+        const image = sharp(file, {animated});
 
         const metadata = await image.metadata();
 
         let width: number,
             height: number,
             extract: { top: any; left: any; width: any; height: any; },
-            toFormat = sharpConfig.format || Images.format(file);
+            toFormat = sharpConfig.format || imageFormat;
 
         width = Images.size(size.width, metadata.width);
         height = Images.size(size.height, metadata.height);
@@ -253,7 +256,7 @@ export default class Images {
         }
     }
 
-    private static mergeConfig(config: SharpConfig) {
+    static mergeConfig(config: SharpConfig) {
         const defaultConfig: SharpConfig = {
             resizeOptions: {
                 kernel: 'lanczos3'
@@ -325,6 +328,7 @@ export interface ImageGenerateConfig {
 }
 
 export interface SharpConfig {
+    animated?: boolean | undefined;
     resizeOptions?: ResizeOptions;
     skipOnEnlargement?: boolean;
     silent?: boolean;
@@ -346,11 +350,11 @@ export interface SharpConfig {
     gamma?: number;
     grayscale?: boolean;
     normalize?: boolean;
-    quality: number;
+    quality?: number;
     progressive?: boolean;
     withMetadata?: WriteableMetadata;
     tile?: TileOptions;
-    compressionLevel: number;
+    compressionLevel?: number;
     format?: keyof FormatEnum;
 }
 

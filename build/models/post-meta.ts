@@ -11,10 +11,12 @@ export default class PostMeta {
     tags = '';
     author: PostAuthor;
     thumbnail: string;
+    metaImage: string;
     url: string;
 
     constructor(file = '', title = '', body = '', postDate = undefined, updateDate = undefined,
-                mastImage = undefined, excerpt = '', tags = '', author = new PostAuthor()) {
+                mastImage = undefined, metaImage = '', excerpt = '', tags = '', author = new PostAuthor()) {
+        this.metaImage = metaImage;
         this.file = file;
         this.title = title;
         this.body = body;
@@ -36,6 +38,9 @@ export default class PostMeta {
             this.mastImage = <HTMLElement>mastImage;
             this.thumbnail = this.mastImage.getElementsByTagName('source')[3].srcset;
         }
+
+        const metaImage = metaTag.querySelector('#metaImage')?.innerHTML;
+        if (metaImage) this.metaImage = metaImage.trim();
 
         const postDate = metaTag.querySelector('#post-date')?.innerHTML;
         if (postDate) this.postDate = new Date(postDate.trim());

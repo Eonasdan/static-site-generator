@@ -172,10 +172,7 @@ export class Watcher {
         const editor = JSON.parse(fields.editor);
         const postDate = new Date(fields.postDate);
 
-        const result = await this.builder.saveAsync(new PostMeta(slug, fields.title,
-            '', postDate, postDate, '',
-            fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl),
-        ), fields.thumbnail, fields.thumbnailAlt, editor);
+        const result = await this.builder.saveAsync(new PostMeta(slug, fields.title, '', postDate, postDate, '', '', fields.excerpt, fields.tags, new PostAuthor(fields.postAuthorName, fields.postAuthorUrl)), fields.thumbnail, fields.thumbnailAlt, editor);
 
         res.write(JSON.stringify(result));
         res.end();
@@ -236,7 +233,11 @@ export class Watcher {
 
         watcher
             .on('all', handleChange)
-            .on('ready', () => console.log('[Make] Watching files...'));
+            .on('ready', () => {
+                console.clear();
+                console.log(`Serving at http://localhost:${this.builder.siteConfig.server.port}`)
+                console.log('[Make] Watching files...');
+            });
     }
 
     private cleanTimer(callback: () => void, delay = 1000) {

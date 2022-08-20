@@ -10,7 +10,8 @@ import * as path from 'path';
 import {minify as minifyHtml} from 'html-minifier-terser';
 import {minify} from 'terser';
 import * as sass from 'sass';
-const {readFileSync } = require('fs')
+
+const {readFileSync} = require('fs')
 const dropCss = require('dropcss');
 const editorJsParser = require("@eonasdan/editorjs-parser");
 const CleanCSS = require('clean-css');
@@ -188,21 +189,27 @@ export default class Build {
             };
 
             newPageDocument.title = postMeta.title;
+
+            let metaImage = '';
+
             if (postMeta.mastImage) {
                 this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), postMeta.mastImage.innerHTML);
                 this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0],
                     `<img src="${postMeta.thumbnail}" alt="${postMeta.title}" class="img-fluid" width="530"/>`);
 
                 const fullyQualifiedImage = `${this.baseUrl}${postMeta.mastImage.getElementsByTagName('source')[0].srcset}`;
-                this.setMetaContent(newPageDocument, 'metaImage', fullyQualifiedImage);
+                metaImage = fullyQualifiedImage;
                 this.setStructuredData(structuredData, 'image', [
                     fullyQualifiedImage
                 ]);
             } else {
                 this.setInnerHtml(newPageDocument.getElementById('post-thumbnail'), '');
                 this.setInnerHtml(loopDocument.getElementsByClassName('post-thumbnail')[0], '');
-                this.setMetaContent(newPageDocument, 'metaImage', '');
             }
+
+            if (postMeta.metaImage) metaImage = `${this.baseUrl}${postMeta.metaImage}`;
+
+            this.setMetaContent(newPageDocument, 'metaImage', metaImage);
 
             this.setMetaContent(newPageDocument, 'metaTitle', postMeta.title);
             this.setStructuredData(structuredData, 'headline', postMeta.title);
@@ -402,7 +409,7 @@ ${this.siteMap}
     }
 
     async getPictureSet(image: string, destination: string, folder: string, alt: string) {
-       return (await this.imageProcessor.generateSourceSetAsync({
+        return (await this.imageProcessor.generateSourceSetAsync({
             images: [image],
             sizes: defaultSizes,
             destinationDirectory: destination,
@@ -443,12 +450,14 @@ ${this.siteMap}
 
             if (postImages.length > 0) {
                 for (const image of postImages) {
-                    const imageName = `${Utilities.slugify(image.data.alt) || path.basename(image.data.file.url)}${path.extname(image.data.file.url)}`;
-                    const newPath = `${postImageCopyPath}/${imageName}`;
-                    await fs.rename(`.${image.data.file.url}`, newPath);
-                    image.data.file.url = newPath.substring(1);
+                    const url = image.data.file.url;
 
-                    var pictureSet = await this.getPictureSet(newPath, postImageCopyPath, postMeta.file, image.data.alt);
+                    const newName = `${Utilities.slugify(image.data.alt || path.parse(url).name)}${path.extname(url)}`;
+                    const oldName = path.basename(url);
+                    const newPath = `.${url.replace(oldName, newName)}`;
+                    await fs.copyFile(`.${url}`, newPath);
+
+                    const pictureSet = await this.getPictureSet(newPath, postImageCopyPath, postMeta.file, image.data.alt);
 
                     image.data.pictureSet = pictureSet.pictureTag;
                 }
@@ -456,11 +465,17 @@ ${this.siteMap}
 
             const body = editorJsParser.parser(rawEditor.blocks);
 
-            const thumbnailName = `${Utilities.slugify(thumbnailAlt)}${path.extname(thumbnail)}`;
-            const newThumbnailPath = `${postImageCopyPath}/${thumbnailName}`;
-            await fs.rename(thumbnail, newThumbnailPath);
+            const thumbnailName = `${Utilities.slugify(thumbnailAlt || path.parse(thumbnail).name)}${path.extname(thumbnail)}`;
+            const oldName = path.basename(thumbnail);
+            const newPath = thumbnail.replace(oldName, thumbnailName);
+            await fs.copyFile(thumbnail, newPath);
 
-            const thumbnailPictureSet = await this.getPictureSet(newThumbnailPath, postImageCopyPath, postMeta.file, thumbnailAlt);
+            const thumbnailPictureSet = await this.getPictureSet(newPath, postImageCopyPath, postMeta.file, thumbnailAlt);
+
+            const socialMetaImage = await this.imageProcessor.generateResponsiveImageAsync(newPath, {width: '1200'}, postImageCopyPath, Images.mergeConfig({
+                format: 'png',
+                animated: false
+            }))
 
             let newPost = (await this.loadTemplateAsync('empty-post'))
                 .replace(/==title==/g, postMeta.title)
@@ -468,6 +483,7 @@ ${this.siteMap}
                 .replace(/==formatted-date==/g, Utilities.formatter.format(postMeta.postDate))
                 .replace(/==body==/g, body)
                 .replace(/==thumbnail==/g, thumbnailPictureSet.pictureTag)
+                .replace(/==metaImage==/g, `${postImageCopyPath}/${socialMetaImage.file}`.substring(1))
                 .replace(/==raw-post-date==/g, postMeta.postDate.toISOString())
                 .replace(/==tags==/g, postMeta.tags)
                 .replace(/==excerpt==/g, postMeta.excerpt)
