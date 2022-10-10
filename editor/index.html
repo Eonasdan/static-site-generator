@@ -44,7 +44,15 @@
             <div class="top-social-info">
                 <button id="runLt" class="btn btn-primary mr-3">Run Language Tools</button>
                 <button id="clearButton" class="btn btn-warning mr-5">Clear</button>
-                <button id="previewButton" class="btn btn-primary mr-3">Preview</button>
+                <div class="btn-group" id="previewGroup">
+                    <button id="previewButton" class="btn btn-primary mr-3">Preview</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li> <button id="previewNewButton" class="btn">Open in new window</button></li>
+                    </ul>
+                </div>
                 <button id="save" class="btn btn-success mr-3">Save</button>
             </div>
             <div class="top-search-area">

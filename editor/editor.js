@@ -39,11 +39,16 @@ class Editor {
     excerptLow = document.getElementById('excerptLow');
     excerptHigh = document.getElementById('excerptHigh');
     thumbnailHelp = document.getElementById('thumbnailHelp');
+    clearButton = document.getElementById('clearButton');
+    saveButton = document.getElementById('save');
+    runLtButton = document.getElementById('runLt');
 
     toastyContainer = document.getElementById('toasty');
     toasty = new bootstrap.Toast(this.toastyContainer);
     toastyClasses = [...this.toastyContainer.classList];
 
+    pageId;
+    channel;
 
     /**
      *
@@ -82,6 +87,26 @@ class Editor {
             this.getActiveMatchHandler.bind(this);
 
         this.languageTools.setup();
+
+        this.channel = new BroadcastChannel('editor');
+
+        this.channel.onmessage = (event) => {
+            console.log('onmessage', event)
+            if (event.data === `editorReady`) {
+                if (!this.pageId) {
+                    this.pageId = 'preview';
+                    this.saveButton.classList.add('d-none');
+                    this.runLtButton.classList.add('d-none');
+                    this.clearButton.classList.add('d-none');
+                    document.getElementById('previewGroup').classList.add('d-none');
+                    this.toggleShow(this.editorDiv, this.outputDiv);
+                }
+            }
+            if (event.data.html) {
+                document.getElementById('previewContent').innerHTML = event.data.html;
+                Prism.highlightAll();
+            }
+        }
     }
 
     dateForInput = () => {
@@ -142,7 +167,16 @@ class Editor {
             this.toggleShow(this.editorDiv, this.outputDiv);
         });
 
-        document.getElementById('clearButton').addEventListener('click', () => {
+        document.getElementById('previewNewButton').addEventListener('click', () => {
+            this.pageId = 'editor';
+            const w = window.open(window.location.href, "_blank");
+            w.addEventListener('DOMContentLoaded', () => {
+                this.channel.postMessage('editorReady');
+            });
+            document.getElementById('previewGroup').classList.add('d-none');
+        });
+
+        this.clearButton.addEventListener('click', () => {
             this.areYouSureModal.show();
 
             const cancel = () => {
@@ -157,9 +191,9 @@ class Editor {
             e.addEventListener('blur', this.metaBlur.bind(this));
         });
 
-        document.getElementById('save').addEventListener('click', this.savePost.bind(this));
+        this.saveButton.addEventListener('click', this.savePost.bind(this));
 
-        document.getElementById('runLt').addEventListener('click', async () => {
+        this.runLtButton.addEventListener('click', async () => {
             const data = await this.editor.save();
             this.languageToolCheck(data);
         });
@@ -212,6 +246,9 @@ class Editor {
 
     async onEditorSave() {
         const data = await this.editor.save();
+        if (this.pageId === 'editor') {
+            this.channel.postMessage({html: eonasdan.parser(data.blocks)});
+        }
         if (this.config.services.languageTools && data && !this.updatingBlock) {
             this.ltBounce(data, 3000);
         }

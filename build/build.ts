@@ -39,6 +39,7 @@ export default class Build {
 
     subFolder: string;
     baseUrl: string;
+    baseImagePath:string;
     imageProcessor = new Images();
 
     constructor() {
@@ -46,6 +47,7 @@ export default class Build {
         FileHelpers.siteConfig = this.siteConfig;
         this.subFolder = this.siteConfig.site.subfolder ? `${this.siteConfig.site.subfolder}/` : '';
         this.baseUrl = `${this.siteConfig.site.root}/${this.subFolder}`;
+        this.baseImagePath = `/${this.subFolder}img/`;
     }
 
     async updateAllAsync() {
@@ -413,7 +415,7 @@ ${this.siteMap}
             images: [image],
             sizes: defaultSizes,
             destinationDirectory: destination,
-            sourceSetPath: `/${this.subFolder}img/${folder}`
+            sourceSetPath: `${this.baseImagePath}${folder}`
         }, [alt]))[0];
     }
 
@@ -475,7 +477,7 @@ ${this.siteMap}
             const socialMetaImage = await this.imageProcessor.generateResponsiveImageAsync(newPath, {width: '1200'}, postImageCopyPath, Images.mergeConfig({
                 format: 'png',
                 animated: false
-            }))
+            }));
 
             let newPost = (await this.loadTemplateAsync('empty-post'))
                 .replace(/==title==/g, postMeta.title)
@@ -483,7 +485,7 @@ ${this.siteMap}
                 .replace(/==formatted-date==/g, Utilities.formatter.format(postMeta.postDate))
                 .replace(/==body==/g, body)
                 .replace(/==thumbnail==/g, thumbnailPictureSet.pictureTag)
-                .replace(/==metaImage==/g, `${postImageCopyPath}/${socialMetaImage.file}`.substring(1))
+                .replace(/==metaImage==/g, `${this.baseImagePath}${postMeta.file}/${socialMetaImage.file}`)
                 .replace(/==raw-post-date==/g, postMeta.postDate.toISOString())
                 .replace(/==tags==/g, postMeta.tags)
                 .replace(/==excerpt==/g, postMeta.excerpt)
