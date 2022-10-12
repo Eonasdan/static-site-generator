@@ -19,6 +19,7 @@ export interface SiteConfig {
         bio: string;
     },
     services: {
-        languageTools: boolean
+        languageTools: boolean;
+        azureSearch: boolean;
     }
 }

@@ -1,0 +1,43 @@
+<article>
+    <div class="post-content mt-0">
+        <h1 class="post-title mb-2">Getting Started</h1>
+
+        <div class="col-5 mb-30">
+            <div class="post-meta d-flex justify-content-between align-items-center">
+                <span class="post-author d-flex">By Jonathan Peterson</span>
+                <i class="fa-solid fa-circle d-flex" aria-hidden="true"></i>
+                <span class="post-date d-flex">October 9, 2022</span>
+            </div>
+        </div>
+    </div>
+
+    <h2>Why?</h2><p>I wanted a configurable, easy to use static site generator for my blog. I wanted to be able to write real HTML and not use markup to create content. At the same time, I didn't want to have to duplicate the layout and the usual headaches that come with HTML content. </p><p>I also wanted to have built in SEO and have things auto generate for me.</p><p>This project has grown to do a lot of things, including generating image sets at Bootstrap's default breakpoints. The built-in editor supports LanguageTool, which gives you near real time spelling and grammar checking.</p><picture>
+<source media="(min-width: 1200px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-1200w.webp"/>
+<source media="(min-width: 992px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-992w.webp"/>
+<source media="(min-width: 768px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-768w.webp"/>
+<source media="(min-width: 576px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-576w.webp"/>
+<source media="(min-width: 376px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-376w.webp"/>
+<img src="/static-site-generator/img/getting-started/006caffe29f526520114bbd01-1200w.webp" alt="" height="851" width="1200"/>
+</picture><p>It also supports adding an Azure Cognitive Search to let your visitors search your site with the power of Azure.</p><h2>How?</h2><p>This project makes heavy use of NodeJS to process partial pages and posts and combine them with template files. The pages are process to generate minimal CSS and JavaScript, along with sitemaps, manifests, image and SEO tags.</p><h2>What?</h2><p>The result is what I use for my own personal blog and I hope it's something that can work for you too.</p><h2>Have A Tour Around</h2><p>There's a lot of background stuff that you might not care about, so I will point out the most important pieces first if you want to use this for your own project.</p><h2>Build</h2><p>The build folder has a file called site.config.json. You will want to edit this file to fit your site. You can read more about that <span><a>href</a></span><a>="http://site-config.html"&gt;on this page</a>.</p><h2>Docker</h2><p>If you want the LanguageTool integration, you will need to run languagetool.yml. This is a docker compose file and will set up everything needed to locally host the free version of LanguageTool. This is completely optional.</p><h2>Editor</h2><p>The editor folder contains the files for the WYSIWYG editor, powered by EditorJS. You can read more about this on this page.</p><h2>Site source</h2><p>This is the main folder for your site. If you want to change the look and feel then you can make changes to the template. You can read more about the templates here.</p><h2>Temporary folders and Outputs</h2><p>The generator will create an img_temp and ts-out folder. Both of these can be ignored and cleaned up. The img_temp folder hold any images that you upload through the editor. These files will automatically be deleted once you save the post or clear the editor.&nbsp;</p><p>The site folder is the completed output. You will want to publish this folder to your host or use a GitHub action to copy it to your gh-pages.</p>
+
+</article>
+
+<section id="post-meta">
+    <span id="title">Getting Started</span>
+    <div id="thumbnail"><picture>
+<source media="(min-width: 1200px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-1200w.webp"/>
+<source media="(min-width: 992px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-992w.webp"/>
+<source media="(min-width: 768px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-768w.webp"/>
+<source media="(min-width: 576px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-576w.webp"/>
+<source media="(min-width: 376px)" srcset="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-376w.webp"/>
+<img src="/static-site-generator/img/getting-started/006caffe29f526520114bbd02-1200w.webp" alt="" height="675" width="1200"/>
+</picture></div>
+    <span id="metaImage">/static-site-generator/img/getting-started/006caffe29f526520114bbd02-1200w.png</span>
+    <span id="post-date">2022-10-10T00:00:00.000Z</span>
+    <span id="excerpt">This guide show you the basic idea behind this repository and how you can use it to create your own static website</span>
+    <span id="tags">SSG, static site generator, eonasdan</span>
+    <section id="post-author">
+        <span id="name">Jonathan Peterson</span>
+        <span id="url">https://jonathanpeterson.com</span>
+    </section>
+</section>

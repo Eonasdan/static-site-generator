@@ -1,0 +1,59 @@
+<article>
+    <div class="post-content mt-0">
+        <h1 class="post-title mb-2">Using the Configuration</h1>
+
+        <div class="col-5 mb-30">
+            <div class="post-meta d-flex justify-content-between align-items-center">
+                <span class="post-author d-flex">By Jonathan Peterson</span>
+                <i class="fa-solid fa-circle d-flex" aria-hidden="true"></i>
+                <span class="post-date d-flex">October 10, 2022</span>
+            </div>
+        </div>
+    </div>
+
+    <p>Several aspects of the generator can be changed and configured through the build/site-config.json.</p><pre><code class="language-json">{
+  "site": {
+    "root": "https://eonasdan.github.io",
+    "subfolder" : "static-site-generator"
+  },
+  "output" : {
+    "main": "site",
+    "posts" : "posts"
+  },
+  "source": "site-source",
+  "server" : {
+    "port": 62296
+  },
+  "defaultAuthor": {
+    "name": "Fred Stone",
+    "url": "https://eonasdan.github.io/static-site-generator/",
+    "avatar": "https://placekitten.com/120/120",
+    "bio": "Check me out. I do stuff."
+  },
+  "services": {
+    "languageTools": true,
+    "azureSearch": true
+  }
+}</code></pre><h2>Site</h2><h3>Root</h3><p>This defines the base URL for your site. Generated links will use this value when creating fully qualified links e.g. https://eonasdan.github.io + page.html</p><h3>Subfolder</h3><p>This property is optional but when set, allows for hosting under a subfolder. If you host this one GitHub Pages without a custom domain, you should set the value to your project name. Note that for development, your project does not need to be under this folder. The development service will automatically handle that.</p><h2>Output</h2><h3>Main</h3><p>This is where the generated site will go. This is also the folder that gets served when you run NPM start.</p><h3>Posts</h3><p>This is where the generated posts will go. This is a subfolder under "main".</p><h2>Source</h2><p>The directory where the build scripts should look for the templates and partials.</p><h2>Server</h2><h3>Port</h3><p>The development server will use this port to host your site locally.</p><h2>Default Author</h2><p>These values are automatically loaded into the editor so that you don't have to type them in each time.</p><h2>Services</h2><p>These are optional external services that can enhance your local experience during page creation or your users experience after the site is deployed.</p><h3>LanguageTool</h3><p>You must have the docker container running for this flag to work. If you don't want to use LT for spelling and grammar, be sure this is set to false.</p><h3>Azure Search</h3><p>If this feature is turned on, the build process will generate an Azure Cognitive Search index document and allows the search box to use ACS.</p>
+
+</article>
+
+<section id="post-meta">
+    <span id="title">Using the Configuration</span>
+    <div id="thumbnail"><picture>
+<source media="(min-width: 1200px)" srcset="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-1200w.webp"/>
+<source media="(min-width: 992px)" srcset="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-992w.webp"/>
+<source media="(min-width: 768px)" srcset="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-768w.webp"/>
+<source media="(min-width: 576px)" srcset="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-576w.webp"/>
+<source media="(min-width: 376px)" srcset="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-376w.webp"/>
+<img src="/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-1200w.webp" alt="how to use the config file" height="675" width="1200"/>
+</picture></div>
+    <span id="metaImage">/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-1200w.png</span>
+    <span id="post-date">2022-10-11T00:00:00.000Z</span>
+    <span id="excerpt">A walkthrough of the configuration file.</span>
+    <span id="tags">SSG, eonasdan, static site generator, config</span>
+    <section id="post-author">
+        <span id="name">Jonathan Peterson</span>
+        <span id="url">https://eonasdan.github.io/static-site-generator/</span>
+    </section>
+</section>

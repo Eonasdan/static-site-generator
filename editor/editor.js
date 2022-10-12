@@ -194,15 +194,13 @@ class Editor {
         this.saveButton.addEventListener('click', this.savePost.bind(this));
 
         this.runLtButton.addEventListener('click', async () => {
-            const data = await this.editor.save();
-            this.languageToolCheck(data);
+            await this.runLanguageToolAsync();
         });
 
     }
 
     setupEditor() {
         const draftEditor = JSON.parse(localStorage.getItem('draft-editor') || '{}');
-        this.blockLanguageToolData = JSON.parse(localStorage.getItem('lt-data')) || [];
 
         // noinspection JSUnusedGlobalSymbols
         this.editor = new EditorJS({
@@ -238,8 +236,11 @@ class Editor {
                 },
             },
             data: draftEditor,
-            onReady: () => {
-                this.languageTools.registerMatchClick()
+            onReady: async () => {
+                if (this.config.services.languageTools) {
+                    await this.runLanguageToolAsync();
+                    this.languageTools.registerMatchClick();
+                }
             }
         });
     }
@@ -256,6 +257,11 @@ class Editor {
     }
 
     bounceTimer;
+
+    async runLanguageToolAsync() {
+        const data = await this.editor.save();
+        this.languageToolCheck(data);
+    }
 
     ltBounce(data, timeOut) {
         clearTimeout(this.bounceTimer);
@@ -283,7 +289,6 @@ class Editor {
         this.metaBlur({target: {name: 'postDate', value: this.postDate.value}});
         this.areYouSureModalConfirm.removeEventListener('click', this.clear);
         this.areYouSureModal.hide();
-        localStorage.setItem('lt-data', null);
         this.blockLanguageToolData = [];
     }
 
@@ -430,8 +435,6 @@ class Editor {
                                 matches: results.matches,
                             });
                         }
-
-                        localStorage.setItem('lt-data', JSON.stringify(this.blockLanguageToolData));
 
                         this.updateBlockTextAndBreak(block.id, results.newText);
                         this.languageTools.registerMatchClick();

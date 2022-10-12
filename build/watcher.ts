@@ -25,7 +25,7 @@ export class Watcher {
         await this.builder.updateAllAsync();
         this.parvusServer = new ParvusServer({
             port: this.builder.siteConfig.server.port,
-            directory: `./${this.builder.siteConfig.server.serveFrom}`,
+            directory: `./${this.builder.siteConfig.output.main}`,
             subfolder: this.builder.siteConfig.site.subfolder,
             middlewares: [
                 {
