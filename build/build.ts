@@ -15,6 +15,7 @@ const {readFileSync} = require('fs')
 const dropCss = require('dropcss');
 const editorJsParser = require("@eonasdan/editorjs-parser");
 const CleanCSS = require('clean-css');
+const prettier = require("prettier");
 
 export default class Build {
     saveInProgress = false;
@@ -75,12 +76,13 @@ export default class Build {
 
     getSearchBody(html) {
         const bodyPrep = html.textContent
-            .toLowerCase()
+            //.toLowerCase()
             .replace('.', ' ') //replace dots with spaces
-            .replace(/((?<=\s)|(?=\s))[^a-z ]*|[^a-z ]*((?<=\s)|(?=\s))/gm, ' ') //remove special characters
-            .replace(/\s+/g, ' ').trim() //replace extra white space
-            .split(' ');// split at words;
-        return Array.from(new Set(bodyPrep)).join(' '); //remove duplicate words
+            .replace(/((?<=\s)|(?=\s))[^a-zA-Z ]*|[^a-zA-Z ]*((?<=\s)|(?=\s))/gm, ' ') //remove special characters
+            .replace(/\r/g, ' ')
+            .replace(/\n/g, ' ')
+            .replace(/\s\s+/g, ' ').trim() //replace extra white space
+        return bodyPrep;
     }
 
     // since everyone has to have their own metadata *rolls eyes* the primary purpose here
@@ -269,12 +271,13 @@ export default class Build {
 </url>`;
         }
 
-        this.postsMeta
+       const search = this.postsMeta
+            .map(x => x.toSearch())
             .sort((a, b) => {
                 return +new Date(a.postDate) > +new Date(b.postDate) ? -1 : 0;
             });
 
-        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(this.postsMeta, null, 2));
+        await FileHelpers.writeFileAndEnsurePathExistsAsync(`./${this.siteConfig.output.main}/js/search.json`, JSON.stringify(search, null, 2));
 
         await this.updateSiteMapAsync();
         await this.updateHomepageAsync();
@@ -490,6 +493,14 @@ ${this.siteMap}
                 .replace(/==tags==/g, postMeta.tags)
                 .replace(/==excerpt==/g, postMeta.excerpt)
                 .replace(/==author-url==/g, postMeta.author.url);
+
+            newPost = prettier.format(newPost, {
+                singleQuote: true,
+                tabWidth: 2,
+                htmlWhitespaceSensitivity: "ignore",
+                endOfLine: "lf",
+                parser: 'html'
+            });
 
             await FileHelpers.writeFileAndEnsurePathExistsAsync(partialPath, newPost);
 

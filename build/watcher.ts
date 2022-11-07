@@ -68,6 +68,14 @@ export class Watcher {
     }
 
     async languagetoolProxyAsync(req: IncomingMessage, res: ServerResponse) {
+        const returnError = (e = undefined) => {
+            console.log('Failed to call language tools', e);
+            res.writeHead(500);
+            res.write(JSON.stringify({
+                'success': 0
+            }));
+            res.end();
+        }
         try {
             const options = {
                 hostname: 'localhost',
@@ -105,16 +113,16 @@ export class Watcher {
                     res.end();
                 });
             });
+
+            outbound.on('error', function(e) {
+                returnError(e);
+            });
+
             outbound.write(`language=en-US&text=${requestBody}`);
             outbound.end();
         }
         catch (e) {
-            console.log('Failed to call language tools', e);
-            res.writeHead(500);
-            res.write(JSON.stringify({
-                'success': 0
-            }));
-            res.end();
+            returnError(e);
         }
     }
 

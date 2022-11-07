@@ -1,0 +1,72 @@
+<article>
+    <div class="post-content mt-0">
+        <h1 class="post-title mb-2">The Build System</h1>
+
+        <div class="col-5 mb-30">
+            <div class="post-meta d-flex justify-content-between align-items-center">
+                <span class="post-author d-flex">By Jonathan Peterson</span>
+                <i class="fa-solid fa-circle d-flex" aria-hidden="true"></i>
+                <span class="post-date d-flex">October 10, 2022</span>
+            </div>
+        </div>
+    </div>
+
+    <p>The build system consists of a number of TypeScript files that get compiled with RollUp to a NodeJS script in the
+        ts-out folder.</p>
+    <h2>Make it so</h2>
+    <p>The make file is the main start-up file. You can optionally turn off the automatic PWA bits if you want by
+        excluding the --pwa flag. If the --watch flag not present then this will just run a simple build and output the
+        results to the "site" folder (default).</p>
+    <h2>Watcher</h2>
+    <p>The watcher file is used when running locally. It launches a small node HTTP server and looks for file changes.
+        Depending on the type of file change, the watcher will execute a related build task. For example, if a partial
+        (like a post) changes or gets created, then watcher will recompile all the partial pages. A socket connection is
+        made with the browser and the node server so that when these files change, the browser will automatically
+        refresh.&nbsp;It is also responsible for file uploads from the editor.</p>
+    <h2>Images</h2>
+    <p>The images script makes use of Sharp to resize and convert images to modern formats (currently, WebP). The editor
+        allows for images to be uploaded and once the post is saved, it will generate an image source set at each
+        Bootstrap breakpoints (376, 576, 786, 992, and 1200px). The image's width determines if all breakpoints are
+        generated or not. Using image with a minimum width of 1200px is recommended.</p>
+    <h2>Build</h2>
+    <p>The build file is the main workhorse. From here, all the partials and posts are read, combined and then output to
+        the "site" directory. </p>
+    <p>I've done a lot here to minify the output files as much as I can. The source CSS is scanned for unused styles and
+        removes them from the compiled. Sometimes this is a bit to aggressive, so you might have to force some of your
+        CSS into the whitelist. This is a known bug.</p>
+    <p>The output HTML and JavaScript are also minified.</p>
+    <p>Any of the pages under the partials folder is process to look for specific CSS classes or element IDs to replace
+        meta information, such as description and title and other transforms that I will cover in the templates docs.&nbsp;</p>
+    <p>Each of the posts will also have the content analyzed to generate a search profile. If you have the Azure Search
+        option enabled the complete profile will need to be uploaded. Otherwise, there's a built-in, very simple, search
+        functionality.</p>
+
+</article>
+
+<section id="post-meta">
+    <span id="title">The Build System</span>
+    <div id="thumbnail">
+        <picture>
+            <source media="(min-width: 1200px)"
+                    srcset="/static-site-generator/img/the-build-system/outlining-the-build-system-1200w.webp"/>
+            <source media="(min-width: 992px)"
+                    srcset="/static-site-generator/img/the-build-system/outlining-the-build-system-992w.webp"/>
+            <source media="(min-width: 768px)"
+                    srcset="/static-site-generator/img/the-build-system/outlining-the-build-system-768w.webp"/>
+            <source media="(min-width: 576px)"
+                    srcset="/static-site-generator/img/the-build-system/outlining-the-build-system-576w.webp"/>
+            <source media="(min-width: 376px)"
+                    srcset="/static-site-generator/img/the-build-system/outlining-the-build-system-376w.webp"/>
+            <img src="/static-site-generator/img/the-build-system/outlining-the-build-system-1200w.webp"
+                 alt="outlining the build system" height="675" width="1200"/>
+        </picture>
+    </div>
+    <span id="metaImage">/static-site-generator/img/the-build-system/outlining-the-build-system-1200w.png</span>
+    <span id="post-date">2022-10-11T00:00:00.000Z</span>
+    <span id="excerpt">Here I've outline how the static site generator builds the output.</span>
+    <span id="tags">SSG, static site generator, eonasdan, build system</span>
+    <section id="post-author">
+        <span id="name">Jonathan Peterson</span>
+        <span id="url">https://eonasdan.github.io/static-site-generator/</span>
+    </section>
+</section>

@@ -63,4 +63,19 @@ export default class PostMeta {
             if (url) this.author.url = url.trim();
         }
     }
+
+    toSearch() {
+        return {
+            file: this.file,
+            title: this.title,
+            body: this.body,
+            postDate: this.postDate,
+            updateDate: this.updateDate,
+            excerpt: this.excerpt,
+            tags: this.tags,
+            thumbnail: this.thumbnail,
+            url: this.url,
+            author: this.author
+        }
+    }
 }

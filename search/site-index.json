@@ -1,0 +1,141 @@
+{
+  "name": "ssg-index",
+  "fields": [
+    {
+      "name": "file",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": true,
+      "retrievable": true,
+      "searchable": false,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "title",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": true,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "body",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "postDate",
+      "type": "Edm.DateTimeOffset",
+      "key": false,
+      "facetable": true,
+      "filterable": true,
+      "retrievable": true,
+      "sortable": true,
+      "analyzer": null
+    },
+    {
+      "name": "updateDate",
+      "type": "Edm.DateTimeOffset",
+      "facetable": true,
+      "filterable": true,
+      "retrievable": true,
+      "sortable": true,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "excerpt",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "tags",
+      "type": "Collection(Edm.String)",
+      "facetable": true,
+      "filterable": true,
+      "retrievable": true,
+      "searchable": true,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "author",
+      "type": "Edm.ComplexType",
+      "key": false,
+      "fields": [
+        {
+          "name": "name",
+          "type": "Edm.String",
+          "facetable": false,
+          "filterable": false,
+          "key": false,
+          "retrievable": true,
+          "searchable": true,
+          "sortable": false,
+          "analyzer": "standard.lucene",
+          "indexAnalyzer": null,
+          "searchAnalyzer": null
+        },
+        {
+          "name": "url",
+          "type": "Edm.String",
+          "key": false,
+          "searchable": false
+        }
+      ]
+    },
+    {
+      "name": "url",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
+    {
+      "name": "thumbnail",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": false,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    }
+  ]
+}
