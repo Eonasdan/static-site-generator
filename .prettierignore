@@ -1,5 +1,4 @@
-dist
-docs
+site
 node_modules
 .github
-coverage
+ts-out
