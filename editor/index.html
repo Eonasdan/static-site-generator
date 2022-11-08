@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
     <title>Editor</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css"
-          crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/style.min.css"/>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/css/style.min.css" />
 
     <!-- editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.5/umd/popper.min.js" integrity="sha512-8cU710tp3iH9RniUh6fq5zJsGnjLzOWLWdZqBMLtqaoZUA6AWIE34lwMB3ipUNiTBP5jEZKY95SfbNnQ8cCKvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.5/umd/popper.min.js"
+      integrity="sha512-8cU710tp3iH9RniUh6fq5zJsGnjLzOWLWdZqBMLtqaoZUA6AWIE34lwMB3ipUNiTBP5jEZKY95SfbNnQ8cCKvA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
@@ -33,283 +43,494 @@
     <script src="https://cdn.jsdelivr.net/npm/@eonasdan/editorjs-parser@1.0.2/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.3.1/dist/bundle.min.js"></script>
 
-    <link rel="stylesheet" href="/editor/styles.css"/>
-</head>
+    <link rel="stylesheet" href="/editor/styles.css" />
+  </head>
 
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark ftco-navbar bg-dark ftco-navbar-light scrolled awake" id="ftco-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="/">Editor</a>
-        <div class="top-meta-data d-flex align-items-center justify-content-end">
-            <div class="top-social-info">
-                <button id="runLt" class="btn btn-primary mr-3">Run Language Tools</button>
-                <button id="clearButton" class="btn btn-warning mr-5">Clear</button>
-                <div class="btn-group" id="previewGroup">
-                    <button id="previewButton" class="btn btn-primary mr-3">Preview</button>
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="visually-hidden">Toggle Dropdown</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li> <button id="previewNewButton" class="btn">Open in new window</button></li>
-                    </ul>
-                </div>
-                <button id="save" class="btn btn-success mr-3">Save</button>
-            </div>
-            <div class="top-search-area">
-            </div>
-        </div>
-    </div>
-</nav>
-
-<div id="mainContent">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="accordion show" id="editorContainer">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
-                                aria-controls="panelsStayOpen-collapseOne">
-                            Meta
-                        </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse"
-                         aria-labelledby="panelsStayOpen-headingOne">
-                        <div id="postMeta" class="accordion-body">
-                            <form id="postMetaForm" action="" method="post">
-                                <div class="mb-3">
-                                    <label for="title" class="form-label">Post Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="title" name="title" required/>
-                                    <div class="invalid-feedback">
-                                        Required
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="thumbnail" class="form-label">Thumbnail <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="file" id="thumbnail" name="thumbnail"
-                                           accept="image/*" required/>
-                                    <div id="thumbnailHelp" class="hide text-danger">The recommended minimum width is 1200px.</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="thumbnailAlt" class="form-label">Thumbnail Alt Text</label>
-                                    <input class="form-control" type="text" id="thumbnailAlt" name="thumbnailAlt" aria-describedby="thumbnailAltHelp">
-                                    <div id="thumbnailAltHelp" class="form-text">This will also be used to name image.</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="postDate" class="form-label">Post Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="postDate" name="postDate" required/>
-                                    <div class="invalid-feedback">
-                                        Required
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="excerpt" class="form-label">Excerpt <span class="text-danger">*</span></label>
-                                    <textarea type="text" class="form-control" id="excerpt" name="excerpt"
-                                              required></textarea>
-                                    <div class="invalid-feedback">
-                                        Required
-                                    </div>
-                                    <div id="excerptHelp" class="form-text">
-                                        A recommend descriptions between <span id="excerptLow">50</span>–<span id="excerptHigh">160</span> character.
-                                        Google generally truncates snippets to ~155–160 characters
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tags" class="form-label">Tags (separate by comma) <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="tags" name="tags" required/>
-                                    <div class="invalid-feedback">
-                                        Required
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="postAuthorName" class="form-label">Post Author Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="postAuthorName" name="postAuthorName"
-                                           required/>
-                                    <div class="invalid-feedback">
-                                        Required
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="postAuthorUrl" class="form-label">Post Author Url</label>
-                                    <input type="text" class="form-control" id="postAuthorUrl" name="postAuthorUrl"/>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
-                                aria-controls="panelsStayOpen-collapseTwo">
-                            Editor
-                        </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show"
-                         aria-labelledby="panelsStayOpen-headingTwo">
-                        <div class="accordion-body">
-                            <div id="editorjs">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <section id="output" class="post-details-area mb-80 hide">
-        <div id="post-container" class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div id="post-thumbnail" class="post-details-thumb mb-50">
-                        <img src="https://placekitten.com/1200/615" alt="" class="img-fluid" width="1200">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row justify-content-center">
-                <!-- Post Details Content Area -->
-                <div class="col-12 col-lg-8 col-xl-7">
-                    <div class="post-details-content">
-                        <div class="blog-content">
-                            <div id="post-inner">
-                                <article>
-                                    <div class="post-content mt-0">
-                                        <h1 class="post-title mb-2">--Title--</h1>
-
-                                        <div class="col-5 mb-30">
-                                            <div class="post-meta d-flex justify-content-between align-items-center">
-                                                <span class="post-author d-flex">--Author--</span>
-                                                <i class="fa-solid fa-circle d-flex" aria-hidden="true"></i>
-                                                <span class="post-date d-flex">--Post Date--</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div id="previewContent">
-
-                                    </div>
-                                    <div class="post-tags mt-30">
-                                        <ul id="tagsContainer"></ul>
-                                    </div>
-                                </article>
-                            </div>
-
-                            <!-- Comment Area Start -->
-                            <div class="comment_area clearfix mb-50">
-
-                                <!-- Section Title -->
-                                <div class="section-heading style-2">
-                                    <h4>Comments</h4>
-                                    <div class="line"></div>
-                                </div>
-
-                                --comments--
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar Widget -->
-                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                    <div class="sidebar-area">
-                        <!-- ***** Single Widget ***** -->
-                        <div class="single-widget p-0 author-widget">
-                            <div class="p-4">
-                                <img class="author-avatar" src="https://placekitten.com/120/120" alt="" width="120"
-                                     height="120"/>
-                                <span class="author-name">[REPLACEME]</span>
-                                <div class="author-social-info">
-                                    <a href="[REPLACEME]" target="_blank" rel="noopener"
-                                       title="Find me on Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                                    <a href="[REPLACEME]" target="_blank" rel="noopener"
-                                       title="Find me on GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
-                                    <a href="[REPLACEME]" target="_blank" rel="noopener"
-                                       title="Find me on Twitch"><i class="fab fa-twitch" aria-hidden="true"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div class="toast align-items-center text-white border-0" role="alert" aria-live="assertive"
-         aria-atomic="true" id="toasty">
-        <div class="d-flex">
-            <div class="toast-body">
-
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-        </div>
-    </div>
-
-    <div class="toast align-items-center text-white bg-info border-0" role="alert" aria-live="assertive"
-         aria-atomic="true" id="savingMessage">
-        <div class="d-flex">
-            <div class="toast-body">
-                <i class="fa-solid fa-floppy-disk fa-beat" aria-hidden="true"></i> Saving...
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="areYouSureModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                Are you Sure?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="areYouSureModalClose">Close</button>
-                <button type="button" class="btn btn-primary" id="areYouSureModalConfirm">Confirm</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="lt-dialog" role="tooltip">
-    <div id="lt-dialog-arrow" data-popper-arrow></div>
-    <div
-            class="toast fade show"
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark ftco-navbar bg-dark ftco-navbar-light scrolled awake"
+      id="ftco-navbar"
     >
-        <div class="toast-header">
-            <strong class="me-auto" id="lt-title"></strong>
+      <div class="container">
+        <a class="navbar-brand" href="/">Editor</a>
+        <div
+          class="top-meta-data d-flex align-items-center justify-content-end"
+        >
+          <div class="top-social-info">
+            <button id="runLt" class="btn btn-primary mr-3">
+              Run Language Tools
+            </button>
+            <button id="clearButton" class="btn btn-warning mr-5">Clear</button>
+            <div class="btn-group" id="previewGroup">
+              <button id="previewButton" class="btn btn-primary mr-3">
+                Preview
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button id="previewNewButton" class="btn">
+                    Open in new window
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <button id="save" class="btn btn-success mr-3">Save</button>
+          </div>
+          <div class="top-search-area"></div>
+        </div>
+      </div>
+    </nav>
+
+    <div id="mainContent">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="accordion show" id="editorContainer">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                <button
+                  class="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#panelsStayOpen-collapseOne"
+                  aria-expanded="true"
+                  aria-controls="panelsStayOpen-collapseOne"
+                >
+                  Meta
+                </button>
+              </h2>
+              <div
+                id="panelsStayOpen-collapseOne"
+                class="accordion-collapse collapse"
+                aria-labelledby="panelsStayOpen-headingOne"
+              >
+                <div id="postMeta" class="accordion-body">
+                  <form id="postMetaForm" action="" method="post">
+                    <div class="mb-3">
+                      <label for="title" class="form-label">
+                        Post Title
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="title"
+                        name="title"
+                        required
+                      />
+                      <div class="invalid-feedback">Required</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="thumbnail" class="form-label">
+                        Thumbnail
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        class="form-control"
+                        type="file"
+                        id="thumbnail"
+                        name="thumbnail"
+                        accept="image/*"
+                        required
+                      />
+                      <div id="thumbnailHelp" class="hide text-danger">
+                        The recommended minimum width is 1200px.
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="thumbnailAlt" class="form-label">
+                        Thumbnail Alt Text
+                      </label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="thumbnailAlt"
+                        name="thumbnailAlt"
+                        aria-describedby="thumbnailAltHelp"
+                      />
+                      <div id="thumbnailAltHelp" class="form-text">
+                        This will also be used to name image.
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="postDate" class="form-label">
+                        Post Date
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="postDate"
+                        name="postDate"
+                        required
+                      />
+                      <div class="invalid-feedback">Required</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="excerpt" class="form-label">
+                        Excerpt
+                        <span class="text-danger">*</span>
+                      </label>
+                      <textarea
+                        type="text"
+                        class="form-control"
+                        id="excerpt"
+                        name="excerpt"
+                        required
+                      ></textarea>
+                      <div class="invalid-feedback">Required</div>
+                      <div id="excerptHelp" class="form-text">
+                        A recommend descriptions between
+                        <span id="excerptLow">50</span>
+                        –
+                        <span id="excerptHigh">160</span>
+                        character. Google generally truncates snippets to
+                        ~155–160 characters
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="tags" class="form-label">
+                        Tags (separate by comma)
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="tags"
+                        name="tags"
+                        required
+                      />
+                      <div class="invalid-feedback">Required</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="postAuthorName" class="form-label">
+                        Post Author Name
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="postAuthorName"
+                        name="postAuthorName"
+                        required
+                      />
+                      <div class="invalid-feedback">Required</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="postAuthorUrl" class="form-label">
+                        Post Author Url
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="postAuthorUrl"
+                        name="postAuthorUrl"
+                      />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#panelsStayOpen-collapseTwo"
+                  aria-expanded="false"
+                  aria-controls="panelsStayOpen-collapseTwo"
+                >
+                  Editor
+                </button>
+              </h2>
+              <div
+                id="panelsStayOpen-collapseTwo"
+                class="accordion-collapse collapse show"
+                aria-labelledby="panelsStayOpen-headingTwo"
+              >
+                <div class="accordion-body">
+                  <div id="editorjs"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section id="output" class="post-details-area mb-80 hide">
+        <div id="post-container" class="container">
+          <div class="row">
+            <div class="col-12">
+              <div id="post-thumbnail" class="post-details-thumb mb-50">
+                <img
+                  src="https://placekitten.com/1200/615"
+                  alt=""
+                  class="img-fluid"
+                  width="1200"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="row justify-content-center">
+            <!-- Post Details Content Area -->
+            <div class="col-12 col-lg-8 col-xl-7">
+              <div class="post-details-content">
+                <div class="blog-content">
+                  <div id="post-inner">
+                    <article>
+                      <div class="post-content mt-0">
+                        <h1 class="post-title mb-2">--Title--</h1>
+
+                        <div class="col-5 mb-30">
+                          <div
+                            class="post-meta d-flex justify-content-between align-items-center"
+                          >
+                            <span class="post-author d-flex">--Author--</span>
+                            <i
+                              class="fa-solid fa-circle d-flex"
+                              aria-hidden="true"
+                            ></i>
+                            <span class="post-date d-flex">--Post Date--</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div id="previewContent"></div>
+                      <div class="post-tags mt-30">
+                        <ul id="tagsContainer"></ul>
+                      </div>
+                    </article>
+                  </div>
+
+                  <!-- Comment Area Start -->
+                  <div class="comment_area clearfix mb-50">
+                    <!-- Section Title -->
+                    <div class="section-heading style-2">
+                      <h4>Comments</h4>
+                      <div class="line"></div>
+                    </div>
+
+                    --comments--
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar Widget -->
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+              <div class="sidebar-area">
+                <!-- ***** Single Widget ***** -->
+                <div class="single-widget p-0 author-widget">
+                  <div class="p-4">
+                    <img
+                      class="author-avatar"
+                      src="https://placekitten.com/120/120"
+                      alt=""
+                      width="120"
+                      height="120"
+                    />
+                    <span class="author-name">[REPLACEME]</span>
+                    <div class="author-social-info">
+                      <a
+                        href="[REPLACEME]"
+                        target="_blank"
+                        rel="noopener"
+                        title="Find me on Twitter"
+                      >
+                        <i class="fab fa-twitter" aria-hidden="true"></i>
+                      </a>
+                      <a
+                        href="[REPLACEME]"
+                        target="_blank"
+                        rel="noopener"
+                        title="Find me on GitHub"
+                      >
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                      </a>
+                      <a
+                        href="[REPLACEME]"
+                        target="_blank"
+                        rel="noopener"
+                        title="Find me on Twitch"
+                      >
+                        <i class="fab fa-twitch" aria-hidden="true"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div
+        class="toast align-items-center text-white border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="toasty"
+      >
+        <div class="d-flex">
+          <div class="toast-body"></div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+
+      <div
+        class="toast align-items-center text-white bg-info border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        id="savingMessage"
+      >
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fa-solid fa-floppy-disk fa-beat" aria-hidden="true"></i>
+            Saving...
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="areYouSureModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">Are you Sure?</div>
+          <div class="modal-footer">
             <button
-                    id="lt-close"
-                    type="button"
-                    class="btn-close"
-                    aria-label="Close"
-            ></button>
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="areYouSureModalClose"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="areYouSureModalConfirm"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="lt-dialog" role="tooltip">
+      <div id="lt-dialog-arrow" data-popper-arrow></div>
+      <div
+        class="toast fade show"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="toast-header">
+          <strong class="me-auto" id="lt-title"></strong>
+          <button
+            id="lt-close"
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="toast-body">
-            <div class="mb-2" id="lt-description"></div>
-            <div id="lt-suggestions"></div>
-            <hr />
-            <div id="lt-ignore">Ignore this</div>
+          <div class="mb-2" id="lt-description"></div>
+          <div id="lt-suggestions"></div>
+          <hr />
+          <div id="lt-ignore">Ignore this</div>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="editor.js"></script>
-<script src="marker.js"></script>
-<script src="md5.js"></script>
-<script src="languagetool.js"></script>
+    <script src="editor.js"></script>
+    <script src="marker.js"></script>
+    <script src="md5.js"></script>
+    <script src="languagetool.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/brands.min.js" integrity="sha512-KGeeDLRAGeJZYsq3J/4s/X6eZyaxTAlScSN2b7z/H/r2MBZ3pAg4T52SzavEJa2Uthmll5HMhvRaLeuxT76EVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/solid.min.js" integrity="sha512-C92U8X5fKxCN7C6A/AttDsqXQiB7gxwvg/9JCxcqR6KV+F0nvMBwL4wuQc+PwCfQGfazIe7Cm5g0VaHaoZ/BOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/fontawesome.min.js" integrity="sha512-5qbIAL4qJ/FSsWfIq5Pd0qbqoZpk5NcUVeAAREV2Li4EKzyJDEGlADHhHOSSCw0tHP7z3Q4hNHJXa81P92borQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/brands.min.js"
+      integrity="sha512-KGeeDLRAGeJZYsq3J/4s/X6eZyaxTAlScSN2b7z/H/r2MBZ3pAg4T52SzavEJa2Uthmll5HMhvRaLeuxT76EVQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/solid.min.js"
+      integrity="sha512-C92U8X5fKxCN7C6A/AttDsqXQiB7gxwvg/9JCxcqR6KV+F0nvMBwL4wuQc+PwCfQGfazIe7Cm5g0VaHaoZ/BOQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/fontawesome.min.js"
+      integrity="sha512-5qbIAL4qJ/FSsWfIq5Pd0qbqoZpk5NcUVeAAREV2Li4EKzyJDEGlADHhHOSSCw0tHP7z3Q4hNHJXa81P92borQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
 
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js" integrity="sha512-RDQSW3KoqJMiX0L/UBgwBmH1EmRYp8LBOiLaA8rBHIy+7OGP/7Gxg8vbt8wG4ZYd29P0Fnoq6+LOytCqx3cyoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-fTl/qcO1VgvKtOMApX2PdZzkziyr2stM65GYPLGuYMnuMm1z2JLJG6XVU7C/mR+E7xBUqCivykuhlzfqxXBXbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js" integrity="sha512-/kVH1uXuObC0iYgxxCKY41JdWOkKOxorFVmip+YVifKsJ4Au/87EisD1wty7vxN2kAhnWh6Yc8o/dSAXj6Oz7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha512-BttltKXFyWnGZQcRWj6osIg7lbizJchuAMotOkdLxHxwt/Hyo+cl47bZU0QADg+Qt5DJwni3SbYGXeGMB5cBcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</body>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"
+      integrity="sha512-RDQSW3KoqJMiX0L/UBgwBmH1EmRYp8LBOiLaA8rBHIy+7OGP/7Gxg8vbt8wG4ZYd29P0Fnoq6+LOytCqx3cyoQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css"
+      integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"
+      integrity="sha512-fTl/qcO1VgvKtOMApX2PdZzkziyr2stM65GYPLGuYMnuMm1z2JLJG6XVU7C/mR+E7xBUqCivykuhlzfqxXBXbg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"
+      integrity="sha512-/kVH1uXuObC0iYgxxCKY41JdWOkKOxorFVmip+YVifKsJ4Au/87EisD1wty7vxN2kAhnWh6Yc8o/dSAXj6Oz7A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.js"
+      integrity="sha512-BttltKXFyWnGZQcRWj6osIg7lbizJchuAMotOkdLxHxwt/Hyo+cl47bZU0QADg+Qt5DJwni3SbYGXeGMB5cBcw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/line-numbers/prism-line-numbers.min.css"
+      integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </body>
 </html>

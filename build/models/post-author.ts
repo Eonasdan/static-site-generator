@@ -1,9 +1,9 @@
 export default class PostAuthor {
-    name: string;
-    url: string;
+  name: string;
+  url: string;
 
-    constructor(name: string = '', url: string = "") {
-        this.name = name;
-        this.url = url;
-    }
+  constructor(name: string = '', url: string = '') {
+    this.name = name;
+    this.url = url;
+  }
 }

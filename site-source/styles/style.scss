@@ -1,4 +1,4 @@
-@use "../../node_modules/bootstrap/scss/bootstrap";
+@use '../../node_modules/bootstrap/scss/bootstrap';
 
 $bodyBackground: #171717;
 $fontColor: #e3e3e3;
@@ -31,7 +31,7 @@ $linkColorHover: #0091ff;
 }
 
 .text-muted {
-  color: #B3B9BD !important;
+  color: #b3b9bd !important;
 }
 
 @keyframes ldsEllipsis1 {
@@ -68,7 +68,12 @@ body {
   color: $fontColor;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   line-height: 1.3;
   font-weight: 500;
 }
@@ -78,18 +83,18 @@ p {
   font-weight: 400;
 }
 
-
 a {
-  -webkit-transition-duration: .5s;
-  -o-transition-duration: .5s;
-  transition-duration: .5s;
+  -webkit-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s;
   text-decoration: none;
   outline: 0 solid transparent;
   color: $linkColor;
   font-weight: 500;
   font-size: 14px;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: $linkColorHover;
   }
 }
@@ -325,7 +330,8 @@ input {
   }
 }
 
-.single-post-area, .post-details-content {
+.single-post-area,
+.post-details-content {
   position: relative;
   z-index: 1;
 
@@ -550,45 +556,44 @@ hr {
     }
   }
 
-.single-post-area {
-  .post-thumbnail {
-    margin-bottom: 30px;
+  .single-post-area {
+    .post-thumbnail {
+      margin-bottom: 30px;
+    }
   }
-}
 
-.post-details-content {
-  .post-content {
-    .post-meta {
-      a {
-        margin-right: 8px;
-        font-size: 12px;
-      }
+  .post-details-content {
+    .post-content {
+      .post-meta {
+        a {
+          margin-right: 8px;
+          font-size: 12px;
+        }
 
-      .fa-circle {
-        margin-right: 8px;
+        .fa-circle {
+          margin-right: 8px;
+        }
       }
     }
   }
-}
 
-.post-author {
-  .post-author-thumb {
-    -webkit-box-flex: 0;
-    -ms-flex: 0 0 80px;
-    flex: 0 0 80px;
-    max-width: 80px;
-    width: 80px;
+  .post-author {
+    .post-author-thumb {
+      -webkit-box-flex: 0;
+      -ms-flex: 0 0 80px;
+      flex: 0 0 80px;
+      max-width: 80px;
+      width: 80px;
+    }
   }
-}
 
-.post-a-comment-area {
-  margin-bottom: 80px;
-}
+  .post-a-comment-area {
+    margin-bottom: 80px;
+  }
 
-.single-widget {
-  padding: 30px 20px;
-}
-
+  .single-widget {
+    padding: 30px 20px;
+  }
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
@@ -649,7 +654,8 @@ hr {
     display: inline-block;
     padding: 0 8px;
 
-    &:focus, &:hover {
+    &:focus,
+    &:hover {
       color: $linkColorHoverSocial;
     }
   }
@@ -658,7 +664,7 @@ hr {
     > .nav-item {
       > .nav-link {
         font-size: 14px;
-        padding: .9rem 0;
+        padding: 0.9rem 0;
         color: rgba(255, 255, 255, 0.9);
         font-weight: 400;
         opacity: 1 !important;
@@ -684,7 +690,7 @@ hr {
 
       &:before {
         position: absolute;
-        content: "";
+        content: '';
         top: 10px;
         bottom: 10px;
         left: 0;
@@ -698,7 +704,7 @@ hr {
         color: #fff;
         border: 1px solid #ce9c6b;
         background: #ce9c6b;
-        padding: .5rem 20px;
+        padding: 0.5rem 20px;
         margin-top: 4px;
         -webkit-border-radius: 30px;
         -moz-border-radius: 30px;
@@ -736,7 +742,7 @@ hr {
     padding-right: 0;
     text-transform: uppercase;
     font-size: 16px;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
   }
 }
 
@@ -768,7 +774,7 @@ hr {
       background: #ce9c6b;
       border: none !important;
       padding-top: 0.5rem !important;
-      padding-bottom: .5rem !important;
+      padding-bottom: 0.5rem !important;
       padding-left: 20px;
       padding-right: 20px;
       margin-top: 6px !important;
@@ -797,7 +803,7 @@ hr {
     padding-right: 0;
     text-transform: uppercase;
     font-size: 16px;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
   }
 
   .nav-link {
@@ -817,15 +823,15 @@ hr {
 
 .ftco-navbar-light.scrolled.awake {
   margin-top: 0;
-  -webkit-transition: .3s all ease-out;
-  -o-transition: .3s all ease-out;
-  transition: .3s all ease-out;
+  -webkit-transition: 0.3s all ease-out;
+  -o-transition: 0.3s all ease-out;
+  transition: 0.3s all ease-out;
 }
 
 .ftco-navbar-light.scrolled.sleep {
-  -webkit-transition: .3s all ease-out;
-  -o-transition: .3s all ease-out;
-  transition: .3s all ease-out;
+  -webkit-transition: 0.3s all ease-out;
+  -o-transition: 0.3s all ease-out;
+  transition: 0.3s all ease-out;
 }
 
 @media (max-width: 991.98px) {
@@ -889,7 +895,6 @@ hr {
   }
 }
 
-
 //*****************search
 .top-search-area {
   position: relative;
@@ -902,9 +907,9 @@ hr {
     border-right: 1px solid #393c3d;
 
     input {
-      -webkit-transition-duration: .5s;
-      -o-transition-duration: .5s;
-      transition-duration: .5s;
+      -webkit-transition-duration: 0.5s;
+      -o-transition-duration: 0.5s;
+      transition-duration: 0.5s;
       width: 250px;
       height: 50px;
       border: none;

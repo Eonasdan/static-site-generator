@@ -1,14 +1,14 @@
 {
   "site": {
     "root": "https://eonasdan.github.io",
-    "subfolder" : "static-site-generator"
+    "subfolder": "static-site-generator"
   },
-  "output" : {
+  "output": {
     "main": "site",
-    "posts" : "posts"
+    "posts": "posts"
   },
   "source": "site-source",
-  "server" : {
+  "server": {
     "port": 62296
   },
   "defaultAuthor": {
