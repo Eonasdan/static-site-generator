@@ -1,12 +1,31 @@
 {
-  "name": "ssg-index",
+  "$schema": "https://gist.githubusercontent.com/Eonasdan/d542197dda52bee7bf138e448424fa1e/raw/064854131f75fd498e64530d75390ad54115ad9d/azure-cognitive-search-index-schema.json",
+  "name": "blog-index",
+  "corsOptions": {
+    "allowedOrigins": [
+      "https://jonathanpeterson.com"
+    ]
+  },
   "fields": [
+    {
+      "name": "id",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": true,
+      "retrievable": true,
+      "searchable": false,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null
+    },
     {
       "name": "file",
       "type": "Edm.String",
       "facetable": false,
       "filterable": false,
-      "key": true,
+      "key": false,
       "retrievable": true,
       "searchable": false,
       "sortable": false,
@@ -88,7 +107,7 @@
     {
       "name": "author",
       "type": "Edm.ComplexType",
-      "key": false,
+      "key": null,
       "fields": [
         {
           "name": "name",
@@ -136,6 +155,34 @@
       "analyzer": null,
       "indexAnalyzer": null,
       "searchAnalyzer": null
+    }
+  ],
+  "scoringProfiles": [
+    {
+      "name": "boostRecent",
+      "functions": [
+        {
+          "fieldName": "postDate",
+          "freshness": {
+            "boostingDuration": "P365D"
+          },
+          "interpolation": "quadratic",
+          "magnitude": null,
+          "distance": null,
+          "tag": null,
+          "type": "freshness",
+          "boost": 3
+        }
+      ],
+      "functionAggregation": "sum",
+      "text": {
+        "weights": {
+          "title": 5,
+          "excerpt": 3,
+          "tags": 2,
+          "body": 2
+        }
+      }
     }
   ]
 }

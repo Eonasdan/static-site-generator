@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+const fs = require('fs').promises;
 
 const {
   SearchIndexClient,
@@ -7,34 +7,36 @@ const {
 
 require('dotenv').config();
 
-const searchServiceName = process.env.AZ_SEARCH_SERVICE_NAME || '';
-const adminApiKey = process.env.AZ_SEARCH_ADMIN_KEY || '';
+const endpoint = process.env.SEARCH_API_ENDPOINT || "";
+const apiKey = process.env.SEARCH_API_KEY || "";
+
+console.log(endpoint)
 
 async function main() {
-  const siteConfig = JSON.parse(
-    await fs.readFile(`./build/site-config.json`, 'utf8')
-  );
-
-  const search = JSON.parse(
-    await fs.readFile(`./${siteConfig.output.main}/js/search.json`, 'utf8')
-  );
-
-  if (!searchServiceName || !adminApiKey) {
+  if (!endpoint  || !apiKey) {
     console.warn('please configure required env vars');
     return;
   }
-  const indexClient = new SearchIndexClient(
-    searchServiceName,
-    new AzureKeyCredential(adminApiKey)
+
+  const siteConfig = JSON.parse(
+      await fs.readFile(`./build/site-config.json`, 'utf8')
   );
+
+  const search = JSON.parse(
+      await fs.readFile(`./${siteConfig.output.main}/js/search.json`, 'utf8')
+  );
+
+  search.forEach(x => x.id = x.file.replace('.html', ''))
+
+  const indexClient = new SearchIndexClient(endpoint, new AzureKeyCredential(apiKey));
   const searchClient = indexClient.getSearchClient(`blog-index`);
 
   console.log('Uploading documents...');
   let indexDocumentsResult = await searchClient.mergeOrUploadDocuments(search);
   console.log(
-    `Index operations succeeded: ${JSON.stringify(
-      indexDocumentsResult.results[0].succeeded
-    )}`
+      `Index operations succeeded: ${JSON.stringify(
+          indexDocumentsResult.results[0].succeeded
+      )}`
   );
 }
 

@@ -3,7 +3,7 @@ import path from 'path';
 import { promisify } from 'util';
 import { SiteConfig } from './models/site-config';
 
-const cp = promisify(require('fs'));
+const cp = promisify(require('fs').cp);
 
 export class FileHelpers {
   static siteConfig: SiteConfig;

@@ -8,7 +8,7 @@ export default class PostMeta {
   updateDate: Date;
   mastImage: HTMLElement;
   excerpt: string;
-  tags = '';
+  tags: string[] = [];
   author: PostAuthor;
   thumbnail: string;
   metaImage: string;
@@ -23,7 +23,7 @@ export default class PostMeta {
     mastImage = undefined,
     metaImage = '',
     excerpt = '',
-    tags = '',
+    tags: string[] = [],
     author = new PostAuthor()
   ) {
     this.metaImage = metaImage;
@@ -62,7 +62,7 @@ export default class PostMeta {
     if (excerpt) this.excerpt = excerpt.trim();
 
     const tags = metaTag.querySelector('#tags')?.innerHTML;
-    if (tags) this.tags = tags.trim();
+    if (tags) this.tags = tags.trim().replace(/, /g,',').split(',');
 
     const postAuthor = metaTag.querySelector('#post-author')?.innerHTML;
     if (postAuthor) {
@@ -74,16 +74,16 @@ export default class PostMeta {
     }
   }
 
-  toSearch() {
+  toSearch(cleanText: (text) => string) {
     return {
       file: this.file,
-      title: this.title,
+      title: cleanText(this.title),
       body: this.body,
       postDate: this.postDate,
       updateDate: this.updateDate,
-      excerpt: this.excerpt,
+      excerpt: cleanText(this.excerpt),
       tags: this.tags,
-      thumbnail: this.thumbnail,
+      thumbnail: cleanText(this.thumbnail),
       url: this.url,
       author: this.author,
     };

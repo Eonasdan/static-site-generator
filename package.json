@@ -6,7 +6,8 @@
     "watch": "node ./ts-out/make.js --watch",
     "build": "npm run rollup && node ./ts-out/make.js --pwa",
     "rollup": "rollup -c ./build/rollup.config.js",
-    "prettier": "prettier --write --ignore-unknown ."
+    "prettier": "prettier --write --ignore-unknown .",
+    "publish-az-search": "npm run build && node ./build/search/upload-to-azure.js"
   },
   "dependencies": {
     "bootstrap": "^5.1.3"

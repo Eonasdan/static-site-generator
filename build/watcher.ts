@@ -209,7 +209,7 @@ export class Watcher {
         '',
         '',
         fields.excerpt,
-        fields.tags,
+          fields.tags.replace(/, /g,',').split(','),
         new PostAuthor(fields.postAuthorName, fields.postAuthorUrl)
       ),
       fields.thumbnail,
