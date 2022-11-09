@@ -521,10 +521,16 @@ ${this.siteMap}
       return output;
     };
 
-    const js = (await getJsAsync()).replace(
+    let js = (await getJsAsync()).replace(
       '[POSTLOOP]',
       loopDocument.getElementsByTagName('body')[0].innerHTML
     );
+
+    if (this.siteConfig.services.azureSearch)
+      js = js.replace(
+        'const useAzureSearch = false;',
+        'const useAzureSearch = true;'
+      );
 
     const uglified = await minify(js);
 
