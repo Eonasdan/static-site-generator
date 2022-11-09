@@ -1,0 +1,20 @@
+{
+  "file": "using-the-configuration.html",
+  "title": "Using the Configuration",
+  "postDate": "2022-10-11T00:00:00.000Z",
+  "updateDate": "2022-11-08T15:23:54.455Z",
+  "excerpt": "A walkthrough of the configuration file",
+  "tags": [
+    "SSG",
+    "eonasdan",
+    "static site generator",
+    "config"
+  ],
+  "thumbnail": "/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-576w.webp",
+  "url": "/static-site-generator/posts/using-the-configuration.html",
+  "author": {
+    "name": "Jonathan Peterson",
+    "url": "https://eonasdan.github.io/static-site-generator/"
+  },
+  "mastImage": "<picture> <source media=\"(min-width: 1200px)\" srcset=\" /static-site-generator/img/using-the-configuration/how-to-use-the-config-file-1200w.webp \" /> <source media=\"(min-width: 992px)\" srcset=\" /static-site-generator/img/using-the-configuration/how-to-use-the-config-file-992w.webp \" /> <source media=\"(min-width: 768px)\" srcset=\" /static-site-generator/img/using-the-configuration/how-to-use-the-config-file-768w.webp \" /> <source media=\"(min-width: 576px)\" srcset=\" /static-site-generator/img/using-the-configuration/how-to-use-the-config-file-576w.webp \" /> <source media=\"(min-width: 376px)\" srcset=\" /static-site-generator/img/using-the-configuration/how-to-use-the-config-file-376w.webp \" /> <img src=\"/static-site-generator/img/using-the-configuration/how-to-use-the-config-file-1200w.webp\" alt=\"how to use the config file\" height=\"675\" width=\"1200\" /> </picture>"
+}

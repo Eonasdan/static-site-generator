@@ -1,0 +1,19 @@
+{
+  "file": "getting-started.html",
+  "title": "Getting Started",
+  "postDate": "2022-10-10T00:00:00.000Z",
+  "updateDate": "2022-11-08T15:23:54.421Z",
+  "excerpt": "This guide show you the basic idea behind this repository and how you can use it to create your own static website",
+  "tags": [
+    "SSG",
+    "static site generator",
+    "eonasdan"
+  ],
+  "thumbnail": "/static-site-generator/img/getting-started/006caffe29f526520114bbd02-576w.webp",
+  "url": "/static-site-generator/posts/getting-started.html",
+  "author": {
+    "name": "Jonathan Peterson",
+    "url": "https://jonathanpeterson.com"
+  },
+  "mastImage": "<picture> <source media=\"(min-width: 1200px)\" srcset=\" /static-site-generator/img/getting-started/006caffe29f526520114bbd02-1200w.webp \" /> <source media=\"(min-width: 992px)\" srcset=\" /static-site-generator/img/getting-started/006caffe29f526520114bbd02-992w.webp \" /> <source media=\"(min-width: 768px)\" srcset=\" /static-site-generator/img/getting-started/006caffe29f526520114bbd02-768w.webp \" /> <source media=\"(min-width: 576px)\" srcset=\" /static-site-generator/img/getting-started/006caffe29f526520114bbd02-576w.webp \" /> <source media=\"(min-width: 376px)\" srcset=\" /static-site-generator/img/getting-started/006caffe29f526520114bbd02-376w.webp \" /> <img src=\"/static-site-generator/img/getting-started/006caffe29f526520114bbd02-1200w.webp\" alt=\"\" height=\"675\" width=\"1200\" /> </picture>"
+}

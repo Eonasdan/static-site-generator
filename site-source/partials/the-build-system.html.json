@@ -1,0 +1,20 @@
+{
+  "file": "the-build-system.html",
+  "title": "The Build System",
+  "postDate": "2022-10-11T00:00:00.000Z",
+  "updateDate": "2022-11-08T15:23:54.439Z",
+  "excerpt": "Here I've outline how the static site generator builds the output",
+  "tags": [
+    "SSG",
+    "static site generator",
+    "eonasdan",
+    "build system"
+  ],
+  "thumbnail": "/static-site-generator/img/the-build-system/outlining-the-build-system-576w.webp",
+  "url": "/static-site-generator/posts/the-build-system.html",
+  "author": {
+    "name": "Jonathan Peterson",
+    "url": "https://eonasdan.github.io/static-site-generator/"
+  },
+  "mastImage": "<picture> <source media=\"(min-width: 1200px)\" srcset=\"/static-site-generator/img/the-build-system/outlining-the-build-system-1200w.webp\"/> <source media=\"(min-width: 992px)\" srcset=\"/static-site-generator/img/the-build-system/outlining-the-build-system-992w.webp\"/> <source media=\"(min-width: 768px)\" srcset=\"/static-site-generator/img/the-build-system/outlining-the-build-system-768w.webp\"/> <source media=\"(min-width: 576px)\" srcset=\"/static-site-generator/img/the-build-system/outlining-the-build-system-576w.webp\"/> <source media=\"(min-width: 376px)\" srcset=\"/static-site-generator/img/the-build-system/outlining-the-build-system-376w.webp\"/> <img src=\"/static-site-generator/img/the-build-system/outlining-the-build-system-1200w.webp\" alt=\"outlining the build system\" height=\"675\" width=\"1200\"/> </picture>"
+}
