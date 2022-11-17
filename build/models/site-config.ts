@@ -20,6 +20,10 @@ export interface SiteConfig {
   };
   services: {
     languageTools: boolean;
-    azureSearch: boolean;
+    azureSearch: {
+      enabled: boolean;
+      requestUrl: string;
+      apiKey: string;
+    };
   };
 }

@@ -90,7 +90,7 @@ export default class Build {
         //.toLowerCase()
         .replace(/\./g, ' ') //replace dots with spaces
         .replace(
-          /((?<=\s)|(?=\s))[^a-zA-Z ]*|[^a-zA-Z ]*((?<=\s)|(?=\s))/gm,
+          /((?<=\s)|(?=\s))[^a-zA-Z0-9 ]*|[^a-zA-Z0-9 ]*((?<=\s)|(?=\s))/gm,
           ' '
         ) //remove special characters
         .replace(/\r/g, ' ')
@@ -182,7 +182,7 @@ export default class Build {
         JSON.parse(await fs.readFile(`${fullPath}.json`, 'utf-8'))
       );
 
-      postMeta.body = this.cleanText(article.innerText);
+      postMeta.body = this.cleanText(article.textContent);
 
       const postTagsUl = newPageDocument.querySelector('.post-tags > ul');
 
@@ -526,11 +526,20 @@ ${this.siteMap}
       loopDocument.getElementsByTagName('body')[0].innerHTML
     );
 
-    if (this.siteConfig.services.azureSearch)
-      js = js.replace(
-        'const useAzureSearch = false;',
-        'const useAzureSearch = true;'
-      );
+    if (this.siteConfig.services.azureSearch.enabled)
+      js = js
+        .replace(
+          'const useAzureSearch = false;',
+          'const useAzureSearch = true;'
+        )
+        .replace(
+          '[AZURE_SEARCH]',
+          this.siteConfig.services.azureSearch.requestUrl
+        )
+        .replace(
+          '[AZURE_SEARCH_API_KEY]',
+          this.siteConfig.services.azureSearch.apiKey
+        );
 
     const uglified = await minify(js);
 
