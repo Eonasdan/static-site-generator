@@ -7,9 +7,10 @@ class Search {
     let html = '';
     if (!filteredPosts || filteredPosts.length === 0)
       html = '<h1>No results</h1>';
-    filteredPosts.forEach((post) => {
-      html += `[POSTLOOP]`;
-    });
+    else
+      filteredPosts.forEach((post) => {
+        html += `[POSTLOOP]`;
+      });
     document.getElementById('post-container').innerHTML = html;
   }
 
@@ -41,7 +42,7 @@ class Search {
       })
         .then((response) => response.json())
         .then((data) => {
-          data.value.forEach(
+          data?.value?.forEach(
             (x) => (x.postDate = formatter.format(new Date(x.postDate)))
           );
           resolve(data.value);
@@ -70,11 +71,11 @@ class Search {
     }
     if (term.startsWith('tag:'))
       this.showPosts(
-        data.filter((x) => x.tags.includes(termLower.replace('tag:', '')))
+        data?.filter((x) => x.tags.includes(termLower.replace('tag:', '')))
       );
     else
       this.showPosts(
-        data.filter(
+        data?.filter(
           (x) =>
             x.title.toLowerCase().includes(termLower) ||
             x.body.includes(termLower)
@@ -90,11 +91,3 @@ if (term) {
   const termLower = term.toLowerCase();
   search.doAsync(termLower).then();
 }
-
-// function onLinkClick(e) {
-//   window.location.href = e.target.href;
-// }
-//
-// [...document.querySelectorAll('.pager .post-title')].forEach((element) =>
-//   element.addEventListener('click', onLinkClick)
-// );
