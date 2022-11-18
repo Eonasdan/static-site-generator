@@ -7,10 +7,12 @@ class Search {
     let html = '';
     if (!filteredPosts || filteredPosts.length === 0)
       html = '<h1>No results</h1>';
-    else
+    else {
+      // noinspection JSUnusedLocalSymbols
       filteredPosts.forEach((post) => {
         html += `[POSTLOOP]`;
       });
+    }
     document.getElementById('post-container').innerHTML = html;
   }
 
@@ -51,12 +53,25 @@ class Search {
     });
   }
 
-  searchLocalAsync() {
+  searchLocalAsync(termLower) {
     return new Promise((resolve, reject) => {
       fetch('/js/search.json')
         .then((response) => response.json())
         .then((data) => {
-          resolve(data);
+          if (term.startsWith('tag:'))
+            resolve(
+              data?.filter((x) =>
+                x.tags.includes(termLower.replace('tag:', ''))
+              )
+            );
+          else
+            resolve(
+              data?.filter(
+                (x) =>
+                  x.title.toLowerCase().includes(termLower) ||
+                  x.body.includes(termLower)
+              )
+            );
         })
         .catch((e) => reject(e));
     });
@@ -69,18 +84,7 @@ class Search {
     } else {
       data = await this.searchLocalAsync(termLower);
     }
-    if (term.startsWith('tag:'))
-      this.showPosts(
-        data?.filter((x) => x.tags.includes(termLower.replace('tag:', '')))
-      );
-    else
-      this.showPosts(
-        data?.filter(
-          (x) =>
-            x.title.toLowerCase().includes(termLower) ||
-            x.body.includes(termLower)
-        )
-      );
+    this.showPosts(data);
   }
 }
 

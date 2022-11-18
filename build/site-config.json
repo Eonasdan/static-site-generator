@@ -19,6 +19,10 @@
   },
   "services": {
     "languageTools": true,
-    "azureSearch": true
+    "azureSearch": {
+      "enabled": true,
+      "requestUrl": "",
+      "apiKey": ""
+    }
   }
 }

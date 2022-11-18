@@ -1,9 +1,9 @@
 {
   "$schema": "https://gist.githubusercontent.com/Eonasdan/d542197dda52bee7bf138e448424fa1e/raw/064854131f75fd498e64530d75390ad54115ad9d/azure-cognitive-search-index-schema.json",
-  "name": "blog-index",
+  "name": "ssg-index",
   "corsOptions": {
     "allowedOrigins": [
-      "https://jonathanpeterson.com"
+      "https://eonasdan.github.io/static-site-generator/"
     ]
   },
   "fields": [
